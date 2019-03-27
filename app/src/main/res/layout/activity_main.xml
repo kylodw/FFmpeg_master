@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/sample_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        app:layout_constraintLeft_toRightOf="@+id/btn_cmd" />
+
+    <Button
+        android:id="@+id/btn_decode"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:onClick="decodeClick"
+        android:text="解码" />
+
+    <Button
+        android:id="@+id/btn_push"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:onClick="streamClick"
+        android:text="推流"
+        app:layout_constraintTop_toBottomOf="@+id/btn_decode" />
+
+    <Button
+        android:id="@+id/btn_cmd"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:onClick="commandClick"
+        android:text="cmd"
+        app:layout_constraintTop_toBottomOf="@+id/btn_push" />
+</android.support.constraint.ConstraintLayout>
