@@ -31,6 +31,7 @@ int ffmpegmain(int argc, char **argv);
 JNIEXPORT jint JNICALL
 Java_com_example_administrator_ffmpeg_1master_MainActivity_ffmpegcore(JNIEnv *env, jobject instance,
                                                                       jobjectArray argv);
+
 }
 //c  end
 

@@ -125,6 +125,7 @@ set_target_properties(
 
 include_directories(src/main/jniLibs/include)
 include_directories(src/main/jniLibs/include/other)
+include_directories(src/main/jniLibs/include/yuv)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #add_definitions(-Wall)
@@ -147,10 +148,8 @@ add_compile_options(-w)
 
 find_library( # Sets the name of the path variable.
         log-lib
-
-        # Specifies the name of the NDK library that
-        # you want CMake to locate.
-        log)
+        log
+        )
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -162,4 +161,6 @@ target_link_libraries( # Specifies the target library.
         native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib})
+        -landroid # Add this.
+        ${log-lib}
+        )

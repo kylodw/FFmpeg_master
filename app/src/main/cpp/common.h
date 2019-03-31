@@ -14,6 +14,7 @@
 #include <time.h>
 
 
+
 using namespace std;
 
 
@@ -23,7 +24,5 @@ using namespace std;
 
 extern "C"{
 JNIEXPORT void JNICALL
-Java_com_example_administrator_ffmpeg_1master_VideoUtil_newdecode(JNIEnv *env, jclass type,
-                                                                  jstring input_, jstring output_);
+Java_com_example_administrator_ffmpeg_1master_VideoUtil_newdecode(JNIEnv *env, jclass type, jstring input_, jstring output_);
 }
-

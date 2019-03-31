@@ -1,5 +1,6 @@
 package com.example.administrator.ffmpeg_master;
 
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -102,6 +103,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void video_util_click(View view) {
-        VideoUtil.newdecode("","");
+
+    }
+
+    public void gotoSurface(View view) {
+        Intent it=new Intent(this,SurfaceActivity.class);
+        startActivity(it);
     }
 }
