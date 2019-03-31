@@ -48,4 +48,10 @@
         android:text="进入surface_view"
         android:onClick="gotoSurface"
         />
+    <android.support.v7.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="去音频解码"
+        android:onClick="gotoAudio"
+        />
 </android.support.v7.widget.LinearLayoutCompat>

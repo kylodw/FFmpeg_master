@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -55,20 +56,25 @@ public class MainActivity extends AppCompatActivity {
 
     public void decodeClick(View view) {
         String folderurl = Environment.getExternalStorageDirectory().getPath();
-        File file = new File(folderurl + "/test.mp4");
-        String input = folderurl + "/test.mp4";
+        String input = folderurl + "/123.mp4";
         String output = folderurl + "/output.yuv";
+        File file=new File(input);
+        if (!file.exists()){
+            Toast.makeText(this, "文件不存在"+input, Toast.LENGTH_SHORT).show();
+            return;
+        }
         decode(input, output);
         Log.e("Main", folderurl);
-        Log.e("Main", file.getName() + "    " + file.getTotalSpace());
     }
 
     public void streamClick(View view) {
-        String folderurl = Environment.getExternalStorageDirectory().getPath();
-        String input = folderurl + "/test.mp4";
-        String output = "rtmp://192.168.31.126:1935/live/livestream";
-        decode(input, output);
-        Log.e("Main", folderurl);
+        Toast.makeText(this, "推流得好好整理", Toast.LENGTH_SHORT).show();
+
+//        String folderurl = Environment.getExternalStorageDirectory().getPath();
+//        String input = folderurl + "/test.mp4";
+//        String output = "rtmp://192.168.31.126:1935/live/livestream";
+//        decode(input, output);
+//        Log.e("Main", folderurl);
     }
 
     public void commandClick(View view) {
@@ -97,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
         //ffmpeg -i input.mp4 -i iQIYI_logo.png -filter_complex overlay output.mp4   //加logo
         //String[] cmds = {"ffmpeg","-i",file.getAbsolutePath(),"-i",outputFile.getAbsolutePath(),"-filter_complex","overlay",outputFiles.getAbsolutePath()};
         //ffmpeg -i input.mp4 -c:v libx265 -x265-params "profile=high:level=3.0" output.mp4
-        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-c:v", "libx265", "-x265-params", "\"profile=high:level=3.0\"", outputFiles.getAbsolutePath()};
-        ffmpegcore(cmds);
+//        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-c:v", "libx265", "-x265-params", "\"profile=high:level=3.0\"", outputFiles.getAbsolutePath()};
+//        ffmpegcore(cmds);
         Log.e("Main", "执行完了啊");
     }
 
@@ -108,6 +114,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void gotoSurface(View view) {
         Intent it=new Intent(this,SurfaceActivity.class);
+        startActivity(it);
+    }
+
+    public void gotoAudio(View view) {
+        Intent it=new Intent(this,AudioActivity.class);
         startActivity(it);
     }
 }

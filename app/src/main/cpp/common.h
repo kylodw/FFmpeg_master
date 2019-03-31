@@ -25,4 +25,11 @@ using namespace std;
 extern "C"{
 JNIEXPORT void JNICALL
 Java_com_example_administrator_ffmpeg_1master_VideoUtil_newdecode(JNIEnv *env, jclass type, jstring input_, jstring output_);
+
+
+JNIEXPORT void JNICALL
+Java_com_example_administrator_ffmpeg_1master_VideoUtil_sound(JNIEnv *env, jobject instance,
+                                                              jstring input_, jstring output_);
+
+
 }

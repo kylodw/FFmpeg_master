@@ -20,7 +20,7 @@ public class SurfaceActivity extends AppCompatActivity {
 
     public void begin(View view) {
         //可以解MP4  mkv，avi，flv的
-        String input=new File(Environment.getExternalStorageDirectory(),"test.mp4").getAbsolutePath();
+        String input=new File(Environment.getExternalStorageDirectory(),"huge.mp4").getAbsolutePath();
         videoUtil.render(input,surfaceView.getHolder().getSurface());
     }
 }

@@ -12,7 +12,7 @@
 
     <android.support.v7.widget.AppCompatButton
         android:layout_width="match_parent"
-        android:text="开始解码"
+        android:text="开始解码手机根目录需要有test.mp4文件"
         android:onClick="begin"
         android:layout_alignParentBottom="true"
         android:layout_height="wrap_content" />
