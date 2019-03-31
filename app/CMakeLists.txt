@@ -113,6 +113,15 @@ set_target_properties(
         PROPERTIES IMPORTED_LOCATION
         ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libswscale-4.so)
 
+#yuv格式转换
+add_library(
+        yuv
+        SHARED
+        IMPORTED)
+set_target_properties(
+        yuv
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libyuv.so)
 
 include_directories(src/main/jniLibs/include)
 include_directories(src/main/jniLibs/include/other)
@@ -150,7 +159,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
         #连接额外的ffmpeg
 
-        native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale
+        native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib})
