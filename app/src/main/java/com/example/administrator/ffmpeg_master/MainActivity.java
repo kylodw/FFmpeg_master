@@ -100,4 +100,8 @@ public class MainActivity extends AppCompatActivity {
         ffmpegcore(cmds);
         Log.e("Main", "执行完了啊");
     }
+
+    public void video_util_click(View view) {
+        VideoUtil.newdecode("","");
+    }
 }

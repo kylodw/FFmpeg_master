@@ -1,15 +1,5 @@
 
-#include <string>
-#include <jni.h>
-#include <android/log.h>
-#include <stdio.h>
-#include <time.h>
-
-using namespace std;
-
-
-#define LOGE(format, ...)  __android_log_print(ANDROID_LOG_ERROR, "这是loge", format, ##__VA_ARGS__)
-#define LOGI(format, ...)  __android_log_print(ANDROID_LOG_INFO,  "这是logi", format, ##__VA_ARGS__)
+#include "common.h"
 extern "C"
 {
 #include "libavcodec/avcodec.h"
@@ -98,11 +88,13 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
 
     //FFmpeg av_log() callback
     av_log_set_callback(custom_log);
-
+    //注册所有组件
     av_register_all();
+    //也可以单个注册
+
     avformat_network_init();
     pFormatCtx = avformat_alloc_context();
-
+    //打开视频文件
     if (avformat_open_input(&pFormatCtx, input_str, NULL, NULL) != 0) {
         LOGE("Couldn't open input stream.\n");
         return -1;
@@ -122,13 +114,14 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
         return -1;
     }
     pCodecCtx = pFormatCtx->streams[videoindex]->codec;
+    //找到解码器
     pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if (pCodec == NULL) {
-        LOGE("Couldn't find Codec.\n");
+        LOGE("找不到解码器\n");
         return -1;
     }
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-        LOGE("Couldn't open codec.\n");
+        LOGE("不能打开解码器\n");
         return -1;
     }
 
@@ -139,7 +132,9 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
     av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, out_buffer,
                          AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1);
 
-
+    //准备读取
+    //AVPacket用于存储一帧一帧的压缩数据（H264）
+    //缓冲区 开辟空间
     packet = (AVPacket *) av_malloc(sizeof(AVPacket));
 
     img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
@@ -165,6 +160,7 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
 
     while (av_read_frame(pFormatCtx, packet) >= 0) {
         if (packet->stream_index == videoindex) {
+            //解码
             ret = avcodec_decode_video2(pCodecCtx, pFrame, &got_picture, packet);
             if (ret < 0) {
                 LOGE("Decode Error.\n");
