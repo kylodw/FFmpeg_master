@@ -6,7 +6,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 
-
 set(CURRENT_DIR ${CMAKE_SOURCE_DIR})
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -21,16 +20,19 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
         src/main/cpp/native-lib.cpp
-#        #编译额外的c文件
+        #        #编译额外的c文件
         src/main/jni/cmdutils.c
         src/main/jni/ffmpeg_filter.c
         src/main/jni/ffmpeg_mod.c
         src/main/jni/ffmpeg_opt.c
         src/main/cpp/ffmpeg_decode_k.cpp
         src/main/cpp/c_k_pthread.cpp
+        src/main/cpp/video_play.cpp
         )
+
+
 #FFmpeg配置目录
-set(distribution_DIR  src/main/jniLibs)
+set(distribution_DIR src/main/jniLibs)
 #编解码
 add_library(
         avcodec
@@ -92,9 +94,6 @@ set_target_properties(
         ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libpostproc-54.so)
 
 
-
-
-
 #音频采样数据格式转换
 add_library(
         wresample
@@ -130,7 +129,6 @@ include_directories(src/main/jniLibs/include/yuv)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #add_definitions(-Wall)
-
 
 
 #set(CMAKE_CXX_COMPILER "clang++")

@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AudioActivity"></activity>
+        <activity android:name=".AudioActivity" />
         <activity android:name=".SurfaceActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MultThreadActivity"></activity>
     </application>
 
 </manifest>

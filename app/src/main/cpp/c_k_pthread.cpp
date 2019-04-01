@@ -15,6 +15,7 @@ static const char *const clazz_name = "com/example/administrator/ffmpeg_master/U
 void *th_fun(void *arg);
 
 
+
 JavaVM *javaVM;
 jobject uuidutil_class_global;
 jmethodID uuid_get_method_id;
@@ -29,6 +30,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 
+
 void *th_fun(void *arg) {
 
     char *no = (char *) (arg);
@@ -37,6 +39,7 @@ void *th_fun(void *arg) {
         JNIEnv *env;
 //    //获取JNIEnv,java_vm关联当前线程
         javaVM->AttachCurrentThread(&env, NULL);
+        JavaVMAttachArgs args[] = {JNI_VERSION_1_4, "my_thread", NULL};
         LOGE("thread %s , 当前i:%d", no, i);
         jstring uuid = (jstring) (env->CallStaticObjectMethod((jclass) uuidutil_class_global,
                                                               uuid_get_method_id));
@@ -71,13 +74,12 @@ Java_com_example_administrator_ffmpeg_1master_PosixThread_pthread(JNIEnv *env, j
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_administrator_ffmpeg_1master_PosixThread_init(JNIEnv *env, jobject instance) {
+    //在子线程中findclass
     jclass uuidutil_class_temp = env->FindClass(clazz_name);
     uuidutil_class_global = env->NewGlobalRef(uuidutil_class_temp);
     //有分号代表引用
     uuid_get_method_id = env->GetStaticMethodID((jclass) (uuidutil_class_global), "get",
                                                 "()Ljava/lang/String;");
-    // TODO
-
 }
 
 extern "C"

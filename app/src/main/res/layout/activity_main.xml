@@ -84,6 +84,12 @@
                 android:text="JNI多线程示例"
                 android:onClick="pthreadExample"
                 />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="多线程解码音视频"
+                android:onClick="gotoMultThread"
+                />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.v7.widget.LinearLayoutCompat>
