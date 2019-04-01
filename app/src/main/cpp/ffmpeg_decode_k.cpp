@@ -5,6 +5,7 @@
 #include <android/native_window_jni.h>
 #include <android/native_window.h>
 #include <unistd.h>
+#include <cstring>
 
 //按照c的编译方式统一编译（混编）
 extern "C" {
@@ -17,8 +18,6 @@ extern "C" {
 #include "libyuv.h"
 #include "libyuv/convert_argb.h"
 #include "libswresample/swresample.h"
-
-int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt);
 }
 using namespace libyuv;
 #define MAX_AUDIO_FRME_SIZE 48000 * 4
@@ -241,6 +240,28 @@ Java_com_example_administrator_ffmpeg_1master_VideoUtil_render(JNIEnv *env, jobj
 }
 
 
+int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt) {
+    int ret;
+
+    *got_frame = 0;
+
+    if (pkt) {
+        ret = avcodec_send_packet(avctx, pkt);
+        // In particular, we don't expect AVERROR(EAGAIN), because we read all
+        // decoded frames with avcodec_receive_frame() until done.
+        if (ret < 0 && ret != AVERROR_EOF)
+            return ret;
+    }
+
+    ret = avcodec_receive_frame(avctx, frame);
+    if (ret < 0 && ret != AVERROR(EAGAIN))
+        return ret;
+    if (ret >= 0)
+        *got_frame = 1;
+
+    return 0;
+}
+
 JNIEXPORT void JNICALL
 Java_com_example_administrator_ffmpeg_1master_VideoUtil_sound(JNIEnv *env, jobject jthiz,
                                                               jstring input_jstr,
@@ -394,24 +415,3 @@ Java_com_example_administrator_ffmpeg_1master_VideoUtil_sound(JNIEnv *env, jobje
 
 }
 
-int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt) {
-    int ret;
-
-    *got_frame = 0;
-
-    if (pkt) {
-        ret = avcodec_send_packet(avctx, pkt);
-        // In particular, we don't expect AVERROR(EAGAIN), because we read all
-        // decoded frames with avcodec_receive_frame() until done.
-        if (ret < 0 && ret != AVERROR_EOF)
-            return ret;
-    }
-
-    ret = avcodec_receive_frame(avctx, frame);
-    if (ret < 0 && ret != AVERROR(EAGAIN))
-        return ret;
-    if (ret >= 0)
-        *got_frame = 1;
-
-    return 0;
-}

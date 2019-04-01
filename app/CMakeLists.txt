@@ -26,8 +26,8 @@ add_library( # Sets the name of the library.
         src/main/jni/ffmpeg_mod.c
         src/main/jni/ffmpeg_opt.c
         src/main/cpp/ffmpeg_decode_k.cpp
-        src/main/cpp/c_k_pthread.cpp
         src/main/cpp/video_play.cpp
+        src/main/cpp/queue.cpp
         )
 
 

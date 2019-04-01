@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         UUIDUtils.get();
         applyPermission();
         posixThread = new PosixThread();
-        posixThread.init();
 
 //        decode(folderurl + "/" + "test.mp4", folderurl + "/" + "output.yuv");
     }
@@ -181,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        posixThread.destroy();
     }
 
     public void pthreadExample2(View view) {
