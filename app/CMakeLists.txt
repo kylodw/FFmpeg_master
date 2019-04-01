@@ -27,6 +27,7 @@ add_library( # Sets the name of the library.
         src/main/jni/ffmpeg_mod.c
         src/main/jni/ffmpeg_opt.c
         src/main/cpp/ffmpeg_decode_k.cpp
+        src/main/cpp/c_k_pthread.cpp
         )
 #FFmpeg配置目录
 set(distribution_DIR  src/main/jniLibs)

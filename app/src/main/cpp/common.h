@@ -22,7 +22,9 @@ using namespace std;
 #define LOGI(format, ...)  __android_log_print(ANDROID_LOG_INFO,  "这是logi", format, ##__VA_ARGS__)
 
 
-extern "C"{
+
+
+extern "C" {
 JNIEXPORT void JNICALL
 Java_com_example_administrator_ffmpeg_1master_VideoUtil_newdecode(JNIEnv *env, jclass type, jstring input_, jstring output_);
 

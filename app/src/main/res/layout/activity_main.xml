@@ -3,55 +3,87 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintLeft_toRightOf="@+id/btn_cmd" />
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btn_decode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="decodeClick"
-        android:text="解码" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_push"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="streamClick"
-        android:text="推流"
-        app:layout_constraintTop_toBottomOf="@+id/btn_decode" />
+            <TextView
+                android:id="@+id/sample_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello World!"
+                app:layout_constraintLeft_toRightOf="@+id/btn_cmd" />
 
-    <Button
-        android:id="@+id/btn_cmd"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="commandClick"
-        android:text="cmd"
-        app:layout_constraintTop_toBottomOf="@+id/btn_push" />
-    <android.support.v7.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="video_util_click"
-        android:text="video_util"
-        />
-    <android.support.v7.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="进入surface_view"
-        android:onClick="gotoSurface"
-        />
-    <android.support.v7.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="去音频解码"
-        android:onClick="gotoAudio"
-        />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="注意：要测试必须下载文件"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16dp" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="downloadFile"
+                android:text="下载test.mp4到本地" />
+
+            <Button
+                android:id="@+id/btn_decode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="decodeClick"
+                android:text="解码" />
+
+            <Button
+                android:id="@+id/btn_push"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="streamClick"
+                android:text="推流"
+                app:layout_constraintTop_toBottomOf="@+id/btn_decode" />
+
+            <Button
+                android:id="@+id/btn_cmd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="commandClick"
+                android:text="cmd"
+                app:layout_constraintTop_toBottomOf="@+id/btn_push" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="video_util_click"
+                android:text="video_util" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="gotoSurface"
+                android:text="进入surface_view" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="gotoAudio"
+                android:text="去音频解码" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="JNI多线程示例"
+                android:onClick="pthreadExample"
+                />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </android.support.v7.widget.LinearLayoutCompat>
