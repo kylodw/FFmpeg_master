@@ -12,12 +12,14 @@
 #include <unistd.h>
 #include <malloc.h>
 #include <cstring>
-extern "C"{
+
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libswscale/swscale.h>
 #include <libswresample/swresample.h>
 #include <libyuv.h>
+#include <libavutil/time.h>
 };
 //nb_streams  音频流，视频流，字幕
 #define MAX_STREAM 2
@@ -33,7 +35,7 @@ struct _Player {
     AVCodecContext *input_codec_context[MAX_STREAM];
     pthread_t decode_threads[MAX_STREAM];
     ANativeWindow *nativeWindow;
-
+    //音频
     enum AVSampleFormat in_sample_fmt;
     enum AVSampleFormat out_sample_fmt;
     int in_sample_rate;
@@ -44,21 +46,29 @@ struct _Player {
     jobject audio_track;
     jmethodID audio_track_write_mid;
 
-    pthread_t  thread_read_from_stream;
+    pthread_t thread_read_from_stream;
     //流的总个数
     int capture_stream_no;
     //音频视频队列数组
     Queue *packets[MAX_STREAM];
+    //互斥锁
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+
+    //视频开始播放时间
+    int64_t  start_time;
+
+    int64_t  audio_clock;
 };
 typedef struct _Player Player;
 /**
  * 解码数据
  */
-struct  _DecodeData{
+struct _DecodeData {
     Player *player;
     int stream_index;
 };
-typedef  struct _DecodeData DecodeData;
+typedef struct _DecodeData DecodeData;
 
 
 extern "C" {
@@ -72,6 +82,9 @@ void *decode_data(void *arg);
 void decode_video_prepare(JNIEnv *env, Player *player, jobject surface);
 void decode_video(Player *player, AVPacket *pPacket);
 void decode_audio(Player *player, AVPacket *avPacket);
+/**
+ * 生产线程的回调
+ */
 void *player_read_from_stream(void *arg);
 
 JNIEXPORT void JNICALL
@@ -82,7 +95,9 @@ void decode_audio_prepare(JNIEnv *pEnv, Player *pPlayer);
 int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt);
 void jni_audio_init(JNIEnv *env, jobject jthiz, Player *player);
 void player_alloc_queues();
-void* packet_free_func(AVPacket *packet);
+void *packet_free_func(AVPacket *packet);
+void player_wait_for_frame(Player *player, int64_t stream_time, int stream_no);
+int64_t player_get_current_video_time(Player *player);
 }
 
 using namespace libyuv;//加载动态库的时候自动执行
