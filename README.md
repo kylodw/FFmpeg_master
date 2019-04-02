@@ -5,6 +5,7 @@ POSIX 标准
 man pthread create 
 
 >三个线程   两个队列实现音视频同步
+
 两个队列 ：
     - 音频AVPacket Queue
     - 视频AVPacket Queue
