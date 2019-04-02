@@ -29,6 +29,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/video_play.cpp
         src/main/cpp/queue.cpp
         src/main/cpp/live.cpp
+#        src/main/cpp/c_k_pthread.cpp
         )
 
 
@@ -123,6 +124,36 @@ set_target_properties(
         yuv
         PROPERTIES IMPORTED_LOCATION
         ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libyuv.so)
+#x264
+add_library(
+        x264
+        STATIC
+        IMPORTED)
+set_target_properties(
+        x264
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libx264.a)
+
+#faac
+add_library(
+        faac
+        STATIC
+        IMPORTED)
+set_target_properties(
+        faac
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libfaac.a)
+
+#yuv格式转换
+add_library(
+        rtmp
+        SHARED
+        IMPORTED)
+set_target_properties(
+        rtmp
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/librtmp.so)
+
 
 include_directories(src/main/jniLibs/include)
 include_directories(src/main/jniLibs/include/other)
@@ -158,7 +189,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
         #连接额外的ffmpeg
 
-        native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv
+        native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv x264 faac rtmp
         # Links the target library to the log library
         # included in the NDK.
         -landroid # Add this.
