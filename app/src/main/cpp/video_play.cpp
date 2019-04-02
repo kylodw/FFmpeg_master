@@ -293,7 +293,6 @@ void decode_audio(Player *player, AVPacket *avPacket) {
 //
 //            player_wait_for_frame(player, player->audio_clock ,
 //                                  player->audio_stream_index);
-//
 //        }
 //        // 一个pcm文件  fwrite(out_buffer, 1, out_buffer_size, fp_pcm);
         JavaVM *javaVM = player->javaVM;
@@ -312,7 +311,7 @@ void decode_audio(Player *player, AVPacket *avPacket) {
         env->DeleteLocalRef(audio_sample_array);
 //        env->DeleteGlobalRef(player->audio_track);
         javaVM->DetachCurrentThread();
-        usleep(1000 * 16);
+//        usleep(1000 * 16);
     }
     av_frame_free(&frame);
 }

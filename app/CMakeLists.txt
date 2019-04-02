@@ -28,6 +28,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/ffmpeg_decode_k.cpp
         src/main/cpp/video_play.cpp
         src/main/cpp/queue.cpp
+        src/main/cpp/live.cpp
         )
 
 

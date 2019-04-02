@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.ffmpeg_master.live.LiveActivity;
 import com.example.administrator.ffmpeg_master.util.CmdUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -187,6 +188,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void gotoMultThread(View view) {
         Intent it = new Intent(this, MultThreadActivity.class);
+        startActivity(it);
+    }
+
+    public void gotoLive(View view) {
+        Intent it = new Intent(this, LiveActivity.class);
         startActivity(it);
     }
 }

@@ -90,6 +90,12 @@
                 android:text="多线程解码音视频"
                 android:onClick="gotoMultThread"
                 />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="音视频采集"
+                android:onClick="gotoLive"
+                />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.v7.widget.LinearLayoutCompat>

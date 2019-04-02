@@ -68,6 +68,10 @@ struct _DecodeData {
     Player *player;
     int stream_index;
 };
+
+
+
+
 typedef struct _DecodeData DecodeData;
 
 
