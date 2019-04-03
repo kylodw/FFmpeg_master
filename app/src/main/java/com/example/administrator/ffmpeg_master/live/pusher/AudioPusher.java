@@ -1,10 +1,15 @@
-package com.example.administrator.ffmpeg_master.live;
+package com.example.administrator.ffmpeg_master.live.pusher;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import com.example.administrator.ffmpeg_master.live.LiveUtil;
+import com.example.administrator.ffmpeg_master.live.params.AudioParams;
+
+import static android.media.AudioFormat.CHANNEL_OUT_STEREO;
 
 /**
  * @Author kylodw
@@ -14,9 +19,9 @@ import android.util.Log;
  */
 public class AudioPusher extends Pusher {
     private final AudioParams audioParams;
-    AudioRecord audioRecord;
+    private AudioRecord audioRecord;
     private boolean isPushing = false;
-    int bufferSizeInBytes;
+    private int bufferSizeInBytes;
     private LiveUtil liveUtil;
 
     public AudioPusher(AudioParams audioParams, LiveUtil liveUtil) {
@@ -28,13 +33,14 @@ public class AudioPusher extends Pusher {
         if (audioParams.getChannel() == 1) {
             channelConfig = AudioFormat.CHANNEL_OUT_MONO;
         } else if (audioParams.getChannel() == 2) {
-            channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+            channelConfig = CHANNEL_OUT_STEREO;
         } else {
-            channelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+            channelConfig = CHANNEL_OUT_STEREO;
         }
+        //这里有问题
         bufferSizeInBytes = AudioTrack.getMinBufferSize(audioParams.getSampleRateInHz(), channelConfig, AudioFormat.ENCODING_PCM_16BIT);
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC
-                , audioParams.getSampleRateInHz(), AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT
+                , audioParams.getSampleRateInHz(), CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT
                 , bufferSizeInBytes);
     }
 
@@ -65,9 +71,8 @@ public class AudioPusher extends Pusher {
                 byte[] buffer = new byte[bufferSizeInBytes];
                 int len = audioRecord.read(buffer, 0, buffer.length);
                 if (len > 0) {
-                    liveUtil.sendAudio(buffer,len);
                     //jni层编码
-                    Log.d("onPreviewFrame", "音频解码");
+                    liveUtil.sendAudio(buffer,len);
                 }
             }
         }

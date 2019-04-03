@@ -13,11 +13,5 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
 LOCAL_CFLAGS := -Wall -O2 -DSYS=posix -DNO_CRYPTO
 APP_PLATFORM := android-23
-
-### librtmp library ###
-### shared library use the first line
-### static library use the second line
-### !!! only one line can be used !!! ###
-
 include $(BUILD_SHARED_LIBRARY)
-#include $(BUILD_STATIC_LIBRARY)
+

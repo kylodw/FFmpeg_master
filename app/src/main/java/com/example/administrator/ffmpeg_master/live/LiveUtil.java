@@ -7,6 +7,12 @@ package com.example.administrator.ffmpeg_master.live;
  */
 public class LiveUtil {
 
+
+    static {
+        System.loadLibrary("rtmp");
+        System.loadLibrary("native-lib");
+    }
+
     public native void startPush(String url);
 
     public native void stopPush();

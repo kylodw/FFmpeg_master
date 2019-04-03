@@ -1,7 +1,12 @@
-package com.example.administrator.ffmpeg_master.live;
+package com.example.administrator.ffmpeg_master.live.pusher;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.view.SurfaceHolder;
+
+import com.example.administrator.ffmpeg_master.live.LiveUtil;
+import com.example.administrator.ffmpeg_master.live.params.AudioParams;
+import com.example.administrator.ffmpeg_master.live.params.VideoParams;
 
 /**
  * @Author kylodw
@@ -13,20 +18,23 @@ public class LivePusher implements SurfaceHolder.Callback {
     VideoPusher videoPusher;
     AudioPusher audioPusher;
     LiveUtil liveUtil;
-    public LivePusher(SurfaceHolder holder) {
+    private Context context;
+
+    public LivePusher(SurfaceHolder holder, Context context) {
         this.surfaceHolder = holder;
         surfaceHolder.addCallback(this);
+        this.context = context;
         livePrepare();
 
     }
 
     private void livePrepare() {
-         liveUtil = new LiveUtil();
+        liveUtil = new LiveUtil();
 
-        VideoParams videoParams = new VideoParams(480, 320, Camera.CameraInfo.CAMERA_FACING_BACK);
-        videoPusher = new VideoPusher(surfaceHolder, videoParams,liveUtil);
+        VideoParams videoParams = new VideoParams(480, 320, Camera.CameraInfo.CAMERA_FACING_BACK, 480000, 25);
+        videoPusher = new VideoPusher(surfaceHolder, videoParams, liveUtil, context);
         AudioParams audioParams = new AudioParams();
-        audioPusher = new AudioPusher(audioParams,liveUtil);
+        audioPusher = new AudioPusher(audioParams, liveUtil);
 
 
     }

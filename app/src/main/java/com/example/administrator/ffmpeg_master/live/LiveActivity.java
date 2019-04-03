@@ -4,13 +4,12 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import com.example.administrator.ffmpeg_master.R;
+import com.example.administrator.ffmpeg_master.live.pusher.LivePusher;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import io.reactivex.functions.Consumer;
@@ -23,14 +22,16 @@ public class LiveActivity extends AppCompatActivity {
     private RxPermissions rxPermissions;
 
     LivePusher livePusher;
-    static final String URL="rtmp地址";
+    //for test
+    static final String URL = "rtmp://47.103.5.187/live/kylodw";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live);
         surfaceView = findViewById(R.id.surface_view);
-        livePusher = new LivePusher(surfaceView.getHolder());
+        livePusher = new LivePusher(surfaceView.getHolder(),this);
         applyPermission();
     }
 

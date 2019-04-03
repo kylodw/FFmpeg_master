@@ -29,7 +29,9 @@ add_library( # Sets the name of the library.
         src/main/cpp/video_play.cpp
         src/main/cpp/queue.cpp
         src/main/cpp/live.cpp
+        src/main/cpp/queue_live.c
 #        src/main/cpp/c_k_pthread.cpp
+
         )
 
 
