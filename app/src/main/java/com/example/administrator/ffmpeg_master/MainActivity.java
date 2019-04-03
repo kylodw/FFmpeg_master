@@ -107,10 +107,10 @@ public class MainActivity extends AppCompatActivity {
     public void streamClick(View view) {
         Toast.makeText(this, "推流得好好整理", Toast.LENGTH_SHORT).show();
 
-//        String folderurl = Environment.getExternalStorageDirectory().getPath();
-//        String input = folderurl + "/test.mp4";
-//        String output = "rtmp://192.168.31.126:1935/live/livestream";
-//        decode(input, output);
+        String folderurl = Environment.getExternalStorageDirectory().getPath();
+        String input = folderurl + "/test.mp4";
+        String output = "rtmp://47.103.5.187:1935/live/kylodw";
+        decode(input, output);
 //        Log.e("Main", folderurl);
     }
 

@@ -9,6 +9,7 @@
 
 
 x264_picture_t picture_in;
+
 int y_len, u_len, v_len;
 x264_t *video_encode_264_handle;
 pthread_mutex_t mutex;
@@ -55,6 +56,7 @@ Java_com_example_administrator_ffmpeg_1master_live_LiveUtil_sendVideo(JNIEnv *en
     //清除数组上的数剧
     memset(sps, 0, 100);
     memset(pps, 0, 100);
+    picture_in.i_pts+=1;
     i = 0;
     for (; i < n_nal; i++) {
         if (pp_nal[i].i_type == NAL_SPS) {
@@ -107,7 +109,7 @@ void add_264_body(unsigned char *buffer, int len) {
     memcpy(&body[9], buffer, len);
 
     rtmpPacket->m_packetType = RTMP_PACKET_TYPE_VIDEO;
-    rtmpPacket->m_nBodySize = (uint32_t) (body);
+    rtmpPacket->m_nBodySize = (uint32_t) (size);
     rtmpPacket->m_nTimeStamp = RTMP_GetTime() - start_time;
     rtmpPacket->m_hasAbsTimestamp = 0;
     rtmpPacket->m_nChannel = 0x04; //音视频通道
@@ -228,9 +230,9 @@ void *start_push(void *arg) {
             LOGE("send_result %d", send_result);
             if (!send_result) {
                 LOGE("%s", "发送失败");
-//                RTMPPacket_Free(packet);
-//                pthread_mutex_unlock(&mutex);
-//                goto end;
+                RTMPPacket_Free(packet);
+                pthread_mutex_unlock(&mutex);
+                goto end;
             } else{
                 LOGE("%s","发送成功!");
             }
@@ -273,13 +275,13 @@ Java_com_example_administrator_ffmpeg_1master_live_LiveUtil_startPush(JNIEnv *en
 JNIEXPORT void JNICALL
 Java_com_example_administrator_ffmpeg_1master_live_LiveUtil_stopPush(JNIEnv *env,
                                                                      jobject instance) {
+    free(rtmp_pth);
 
 }
 
 JNIEXPORT void JNICALL
 Java_com_example_administrator_ffmpeg_1master_live_LiveUtil_release(JNIEnv *env, jobject instance) {
 
-    free(rtmp_pth);
 }
 
 JNIEXPORT void JNICALL
@@ -294,6 +296,7 @@ Java_com_example_administrator_ffmpeg_1master_live_LiveUtil_setVideoOptions(JNIE
     param.i_csp = X264_CSP_I420;  //编码输入的像素格式  YUV420P
     param.i_width = width;
     param.i_height = height;
+
     param.rc.i_rc_method = X264_RC_CRF;  //恒定码率 CQP恒定质量 ABR 平均码率
     param.rc.i_bitrate = bitrate / 1000;  //kbps
     param.rc.i_vbv_max_bitrate = static_cast<int>(bitrate / 1000 * 1.2);  //瞬时最大码率
@@ -317,8 +320,9 @@ Java_com_example_administrator_ffmpeg_1master_live_LiveUtil_setVideoOptions(JNIE
     //3 输入图像初始化
 
     x264_picture_alloc(&picture_in, param.i_csp, param.i_width, param.i_height);
+    picture_in.i_pts=0;
     //4 打开编码器
-    video_encode_264_handle = x264_encoder_open_157(&param);
+    video_encode_264_handle = x264_encoder_open(&param);
     if (!video_encode_264_handle) {
         LOGE("x264_t%s", "编码失败");
     } else {

@@ -23,7 +23,7 @@ public class LiveActivity extends AppCompatActivity {
 
     LivePusher livePusher;
     //for test
-    static final String URL = "rtmp://47.103.5.187/live/kylodw";
+    static final String URL = "rtmp://47.103.5.187:1935/live/kylodw";
 
 
     @Override
