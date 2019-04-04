@@ -1,5 +1,8 @@
 
+#include <unistd.h>
 #include "common.h"
+
+
 extern "C"
 {
 #include "libavcodec/avcodec.h"
@@ -124,6 +127,8 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
         LOGE("不能打开解码器\n");
         return -1;
+    } else {
+        LOGE("打开解码器");
     }
 
     pFrame = av_frame_alloc();
@@ -143,17 +148,19 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
                                      SWS_BICUBIC, NULL, NULL, NULL);
 
 
-    sprintf(info, "[Input     ]%s\n", input_str);
-    sprintf(info, "%s[Output    ]%s\n", info, output_str);
-    sprintf(info, "%s[Format    ]%s\n", info, pFormatCtx->iformat->name);
-    sprintf(info, "%s[Codec     ]%s\n", info, pCodecCtx->codec->name);
-    sprintf(info, "%s[Resolution]%dx%d\n", info, pCodecCtx->width, pCodecCtx->height);
+//    sprintf(info, "[Input     ]%s\n", input_str);
+//    sprintf(info, "%s[Output    ]%s\n", info, output_str);
+//    sprintf(info, "%s[Format    ]%s\n", info, pFormatCtx->iformat->name);
+//    sprintf(info, "%s[Codec     ]%s\n", info, pCodecCtx->codec->name);
+//    sprintf(info, "%s[Resolution]%dx%d\n", info, pCodecCtx->width, pCodecCtx->height);
 
 
     fp_yuv = fopen(output_str, "wb+");
     if (fp_yuv == NULL) {
         printf("Cannot open output file.\n");
         return -1;
+    } else {
+        LOGE("打开文件");
     }
 
     frame_cnt = 0;
@@ -166,6 +173,8 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
             if (ret < 0) {
                 LOGE("Decode Error.\n");
                 return -1;
+            } else {
+                LOGE("decode");
             }
             if (got_picture) {
                 sws_scale(img_convert_ctx, (const uint8_t *const *) pFrame->data, pFrame->linesize,
@@ -256,218 +265,145 @@ JNIEXPORT jint JNICALL
 Java_com_example_administrator_ffmpeg_1master_MainActivity_stream(JNIEnv *env, jobject instance,
                                                                   jstring input_jstr,
                                                                   jstring output_jstr) {
-//    AVOutputFormat *ofmt = NULL;
-//    AVFormatContext *ifmt_ctx = NULL, *ofmt_ctx = NULL;
-//    AVPacket pkt;
-//    int videoindex = -1;
-////    int ret, i;
-//    char input_str[500] = {0};
-//    char output_str[500] = {0};
-////    char info[1000] = {0};
-//    sprintf(input_str, "%s", env->GetStringUTFChars(input_jstr, NULL));
-//    sprintf(output_str, "%s", env->GetStringUTFChars(output_jstr, NULL));
-//
-//    //input_str  = "cuc_ieschool.flv";
-//    //output_str = "rtmp://localhost/publishlive/livestream";
-//    //output_str = "rtp://233.233.233.233:6666";
-//
-//    //FFmpeg av_log() callback
-//    av_log_set_callback(custom_log);
-//
-//    av_register_all();
-//    //Network
-//    avformat_network_init();
-//
-//    AVFormatContext *ictx = NULL;
-//
-//    AVOutputFormat *ofmt = NULL;
-//    char *inUrl = const_cast<char *>(env->GetStringUTFChars(input_jstr, NULL));
-//    char *outUrl = const_cast<char *>(env->GetStringUTFChars(input_jstr, NULL));
-//    //打开文件，解封文件头
-//    int ret = avformat_open_input(&ictx, inUrl, 0, NULL);
-//    if (ret < 0) {
-//    }
-//    //获取音频视频的信息 .h264 flv 没有头信息
-//    ret = avformat_find_stream_info(ictx, 0);
-//    if (ret != 0) {
-//    }
-//    //打印视频视频信息
-//    //0打印所有  inUrl 打印时候显示，
-//    av_dump_format(ictx, 0, inUrl, 0);
-//
-//    //////////////////////////////////////////////////////////////////
-//    //                   输出流处理部分
-//    /////////////////////////////////////////////////////////////////
-//    AVFormatContext *octx = NULL;
-//    //如果是输入文件 flv可以不传，可以从文件中判断。如果是流则必须传
-//    //创建输出上下文
-//    ret = avformat_alloc_output_context2(&octx, NULL, "flv", outUrl);
-//    if (ret < 0) {
-//    }
-//    ofmt = octx->oformat;
-//    int i;
-//    //for (i = 0; i < ictx->nb_streams; i++) {
-//    //  cout << "i " << i <<"  "<< ictx->nb_streams<< endl;
-//    //  AVStream *in_stream = ictx->streams[i];
-//    //  AVCodec *codec = avcodec_find_decoder(in_stream->codecpar->codec_id);
-//    //  AVStream *out_stream = avformat_new_stream(octx, codec);
-//    //  if (!out_stream) {
-//    //      printf("Failed allocating output stream\n");
-//    //      ret = AVERROR_UNKNOWN;
-//    //  }
-//    //  AVCodecContext *pCodecCtx = avcodec_alloc_context3(codec);
-//    //  ret = avcodec_parameters_to_context(pCodecCtx, in_stream->codecpar);
-//    //  if (ret < 0) {
-//    //      printf("Failed to copy context input to output stream codec context\n");
-//    //  }
-//    //  pCodecCtx->codec_tag = 0;
-//    //  if (octx->oformat->flags & AVFMT_GLOBALHEADER) {
-//    //      pCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-//    //  }
-//    //  ret = avcodec_parameters_from_context(out_stream->codecpar, pCodecCtx);
-//    //  if (ret < 0) {
-//    //      printf("Failed to copy context input to output stream codec context\n");
-//    //  }
-//    //}
-//
-//    for (i = 0; i < ictx->nb_streams; i++) {
-//
-//        //获取输入视频流
-//        AVStream *in_stream = ictx->streams[i];
-//        //为输出上下文添加音视频流（初始化一个音视频流容器）
-//        AVStream *out_stream = avformat_new_stream(octx, in_stream->codec->codec);
-//        if (!out_stream) {
-//            printf("未能成功添加音视频流\n");
-//            ret = AVERROR_UNKNOWN;
-//        }
-//
-//        //将输入编解码器上下文信息 copy 给输出编解码器上下文
-//        //ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
-//        ret = avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
-//        //ret = avcodec_parameters_from_context(out_stream->codecpar, in_stream->codec);
-//        //ret = avcodec_parameters_to_context(out_stream->codec, in_stream->codecpar);
-//        if (ret < 0) {
-//            printf("copy 编解码器上下文失败\n");
-//        }
-//        out_stream->codecpar->codec_tag = 0;
-//
-//        out_stream->codec->codec_tag = 0;
-//        if (octx->oformat->flags & AVFMT_GLOBALHEADER) {
-//            out_stream->codec->flags = out_stream->codec->flags | CODEC_FLAG_GLOBAL_HEADER;
-//        }
-//    }
-//
-//    //输入流数据的数量循环
-//    for (i = 0; i < ictx->nb_streams; i++) {
-//        if (ictx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-//            videoindex = i;
-//            break;
-//        }
-//    }
-//
-//    av_dump_format(octx, 0, outUrl, 1);
-//
-//    //////////////////////////////////////////////////////////////////
-//    //                   准备推流
-//    /////////////////////////////////////////////////////////////////
-//
-//    //打开IO
-//    ret = avio_open(&octx->pb, outUrl, AVIO_FLAG_WRITE);
-//    if (ret < 0) {
-//    }
-//
-//    //写入头部信息
-//    ret = avformat_write_header(octx, 0);
-//    if (ret < 0) {
-//    }
-//    //推流每一帧数据
-//    //int64_t pts  [ pts*(num/den)  第几秒显示]
-//    //int64_t dts  解码时间 [P帧(相对于上一帧的变化) I帧(关键帧，完整的数据) B帧(上一帧和下一帧的变化)]  有了B帧压缩率更高。
-//    //uint8_t *data
-//    //int size
-//    //int stream_index
-//    //int flag
-//    AVPacket pkt;
-//    //获取当前的时间戳  微妙
-//    long long start_time = av_gettime();
-//    long long frame_index = 0;
-//    while (1) {
-//        //输入输出视频流
-//        AVStream *in_stream, *out_stream;
-//        //获取解码前数据
-//        ret = av_read_frame(ictx, &pkt);
-//        if (ret < 0) {
-//            break;
-//        }
-//
-//        /*
-//        PTS（Presentation Time Stamp）显示播放时间
-//        DTS（Decoding Time Stamp）解码时间
-//        */
-//        //没有显示时间（比如未解码的 H.264 ）
-//        if (pkt.pts == AV_NOPTS_VALUE) {
-//            //AVRational time_base：时基。通过该值可以把PTS，DTS转化为真正的时间。
-//            AVRational time_base1 = ictx->streams[videoindex]->time_base;
-//
-//            //计算两帧之间的时间
-//            /*
-//            r_frame_rate 基流帧速率  （不是太懂）
-//            av_q2d 转化为double类型
-//            */
-//            int64_t calc_duration =
-//                    (double) AV_TIME_BASE / av_q2d(ictx->streams[videoindex]->r_frame_rate);
-//
-//            //配置参数
-//            pkt.pts = (double) (frame_index * calc_duration) /
-//                      (double) (av_q2d(time_base1) * AV_TIME_BASE);
-//            pkt.dts = pkt.pts;
-//            pkt.duration = (double) calc_duration / (double) (av_q2d(time_base1) * AV_TIME_BASE);
-//        }
-//
-//        //延时
-//        if (pkt.stream_index == videoindex) {
-//            AVRational time_base = ictx->streams[videoindex]->time_base;
-//            AVRational time_base_q = {1, AV_TIME_BASE};
-//            //计算视频播放时间
-//            int64_t pts_time = av_rescale_q(pkt.dts, time_base, time_base_q);
-//            //计算实际视频的播放时间
-//            int64_t now_time = av_gettime() - start_time;
-//
-//            AVRational avr = ictx->streams[videoindex]->time_base;
-//            if (pts_time > now_time) {
-//                //睡眠一段时间（目的是让当前视频记录的播放时间与实际时间同步）
-//                av_usleep((unsigned int) (pts_time - now_time));
-//            }
-//        }
-//
-//        in_stream = ictx->streams[pkt.stream_index];
-//        out_stream = octx->streams[pkt.stream_index];
-//
-//        //计算延时后，重新指定时间戳
-//        pkt.pts = av_rescale_q_rnd(pkt.pts, in_stream->time_base, out_stream->time_base,
-//                                   (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-//        pkt.dts = av_rescale_q_rnd(pkt.dts, in_stream->time_base, out_stream->time_base,
-//                                   (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-//        pkt.duration = (int) av_rescale_q(pkt.duration, in_stream->time_base,
-//                                          out_stream->time_base);
-//        //字节流的位置，-1 表示不知道字节流位置
-//        pkt.pos = -1;
-//
-//        if (pkt.stream_index == videoindex) {
-//            frame_index++;
-//        }
-//
-//        //向输出上下文发送（向地址推送）
-//        ret = av_interleaved_write_frame(octx, &pkt);
-//
-//        if (ret < 0) {
-//            printf("发送数据包出错\n");
-//            break;
-//        }
-//
-//        //释放
-//        av_packet_unref(&pkt);
-//    }
+    AVOutputFormat *outputFormat = NULL;
+    AVPacket pkt;
+    const char *in_file_name, *out_file_name;
+    int frame_index = 0;
+    int64_t start_time = av_gettime();
+    int i = 0, videoIndex = 0;
+    int find_stream;
+    in_file_name = env->GetStringUTFChars(input_jstr, NULL);
+    out_file_name = env->GetStringUTFChars(output_jstr, NULL);
+    av_register_all();//注册器
+    AVFormatContext *input_f_cxt = avformat_alloc_context(), *output_f_cxt = avformat_alloc_context();
+    avformat_network_init();//网络
+
+    int ret = avformat_open_input(&input_f_cxt, in_file_name, NULL, NULL);
+    if (ret < 0) {
+        LOGE("%s", "打开文件失败!");
+        goto end;
+    }
+     find_stream = avformat_find_stream_info(input_f_cxt, 0);
+    if (find_stream < 0) {
+        LOGE("%s", "输入流错误");
+        goto end;
+    }
+
+
+
+    for (; i < input_f_cxt->nb_streams; i++) {
+        if (input_f_cxt->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+            videoIndex = i;
+        }
+    }
+    av_dump_format(input_f_cxt, 0, in_file_name, 0);
+
+    avformat_alloc_output_context2(&output_f_cxt, NULL, "flv", out_file_name);
+
+    if (!output_f_cxt) {
+        LOGE("%s", "创建output_context失败");
+        ret = AVERROR_UNKNOWN;
+        goto end;
+    }
+    outputFormat = output_f_cxt->oformat;
+    i = 0;
+    for (; i < input_f_cxt->nb_streams; i++) {
+        AVStream *in_stream = input_f_cxt->streams[i];
+        AVStream *out_stream = avformat_new_stream(output_f_cxt, in_stream->codec->codec);
+        if (!out_stream) {
+            LOGE("%s", "没有输出流");
+            ret = AVERROR_UNKNOWN;
+            goto end;
+        }
+        ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
+        if (ret < 0) {
+            LOGE("%s", "拷贝失败");
+            goto end;
+        }
+        out_stream->codec->codec_tag = 0;
+        if (output_f_cxt->oformat->flags & AVFMT_GLOBALHEADER) {
+            out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        }
+    }
+
+    av_dump_format(output_f_cxt, 0, out_file_name, 1);
+
+    if (!(outputFormat->flags & AVFMT_NOFILE)) {
+        ret = avio_open(&output_f_cxt->pb, out_file_name, AVIO_FLAG_WRITE);
+        if (ret < 0) {
+            LOGE("%s", "不能打开URL");
+            goto end;
+        }
+    }
+
+    ret = avformat_write_header(output_f_cxt, NULL);
+    if (ret < 0) {
+        LOGE("%s:%d", "写入头失败", ret);
+        goto end;
+    }
+
+    while (1) {
+        AVStream *in_stream, *out_stream;
+        ret = av_read_frame(input_f_cxt, &pkt);
+        if (ret < 0) {
+            break;
+        }
+        if (pkt.pts == AV_NOPTS_VALUE) {
+            AVRational time_base = input_f_cxt->streams[videoIndex]->time_base;
+
+            int64_t calc_dur = static_cast<int64_t>(AV_TIME_BASE /
+                                                    av_q2d(input_f_cxt->streams[videoIndex]->r_frame_rate));
+            pkt.pts = static_cast<int64_t>((double) (frame_index * calc_dur) /
+                                           (av_q2d(time_base) * AV_TIME_BASE));
+            pkt.dts = pkt.pts;
+            pkt.duration = static_cast<int64_t>((double) calc_dur /
+                                                (double) (av_q2d(time_base) * AV_TIME_BASE));
+        }
+
+        if (pkt.stream_index == videoIndex) {
+            AVRational time_base = input_f_cxt->streams[videoIndex]->time_base;
+            AVRational time_base_q = {1, AV_TIME_BASE};
+
+            int64_t pts_time = av_rescale_q(pkt.dts, time_base, time_base_q);
+            int64_t now_time = av_gettime() - start_time;
+            if (pts_time > now_time) {
+                av_usleep(static_cast<unsigned int>(pts_time - now_time));
+            }
+        }
+        in_stream = input_f_cxt->streams[pkt.stream_index];
+        out_stream = output_f_cxt->streams[pkt.stream_index];
+
+        pkt.pts = av_rescale_q_rnd(pkt.pts, in_stream->time_base, out_stream->time_base,
+                                   (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+        pkt.dts = av_rescale_q_rnd(pkt.dts, in_stream->time_base, out_stream->time_base,
+                                   (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+        pkt.duration = av_rescale_q(pkt.duration, in_stream->time_base, out_stream->time_base);
+        pkt.pos = -1;
+
+        if (pkt.stream_index == videoIndex) {
+            LOGE("发送视频帧: %8d", frame_index);
+            frame_index++;
+        }
+
+        ret = av_interleaved_write_frame(output_f_cxt, &pkt);
+        if (ret < 0) {
+            LOGE("%s", "写入帧失败");
+            goto end;
+        }
+        av_packet_unref(&pkt);
+
+    }
+    av_write_trailer(output_f_cxt);
+    end:
+    avformat_close_input(&input_f_cxt);
+    if (output_f_cxt && !(outputFormat->flags && AVFMT_NOFILE)) {
+        avio_close(output_f_cxt->pb);
+    }
+    avformat_free_context(output_f_cxt);
+    if (ret < 0) {
+        return -1;
+    }
+
     return 0;
 }
 

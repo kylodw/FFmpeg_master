@@ -7,6 +7,15 @@ package com.example.administrator.ffmpeg_master.live;
  */
 public class LiveUtil {
 
+    LiveListener liveListener;
+
+    public void setLiveListener(LiveListener liveListener) {
+        this.liveListener = liveListener;
+    }
+
+    public void removeLiveListener() {
+        this.liveListener = null;
+    }
 
     static {
         System.loadLibrary("rtmp");
@@ -22,6 +31,12 @@ public class LiveUtil {
     public native void setVideoOptions(int width, int height, int bitrate, int fps);
 
     public native void setAudioOptions(int sampleRateInHz, int channel);
+
+    public void throwNativeError(int code) {
+        if (liveListener != null) {
+            liveListener.onError(code);
+        }
+    }
 
     /**
      * 发送视频

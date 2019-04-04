@@ -4408,7 +4408,7 @@ const AVClass *avcodec_get_subtitle_rect_class(void);
  * avcodec_parameters_from_context() / avcodec_parameters_to_context()
  * functions.
  */
-attribute_deprecated
+//for test
 int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src);
 #endif
 

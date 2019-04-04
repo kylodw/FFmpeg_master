@@ -9,6 +9,7 @@ import android.util.Log;
 import com.example.administrator.ffmpeg_master.live.LiveUtil;
 import com.example.administrator.ffmpeg_master.live.params.AudioParams;
 
+import static android.media.AudioFormat.CHANNEL_OUT_MONO;
 import static android.media.AudioFormat.CHANNEL_OUT_STEREO;
 
 /**
@@ -38,7 +39,7 @@ public class AudioPusher extends Pusher {
             channelConfig = CHANNEL_OUT_STEREO;
         }
         //这里有问题
-        bufferSizeInBytes = AudioTrack.getMinBufferSize(audioParams.getSampleRateInHz(), channelConfig, AudioFormat.ENCODING_PCM_16BIT);
+        bufferSizeInBytes = AudioTrack.getMinBufferSize(audioParams.getSampleRateInHz(), CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT);
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC
                 , audioParams.getSampleRateInHz(), CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT
                 , bufferSizeInBytes);
@@ -49,6 +50,7 @@ public class AudioPusher extends Pusher {
 
         isPushing = true;
         new Thread(new AudioRecodeTask()).start();
+        liveUtil.setAudioOptions(audioParams.getSampleRateInHz(),CHANNEL_OUT_STEREO);
     }
 
     @Override

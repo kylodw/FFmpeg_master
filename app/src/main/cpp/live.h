@@ -48,6 +48,9 @@ void add_264_body(uint8_t *payload, int i_payload);
 
 void add_rtmp_packet(RTMPPacket *pPacket);
 void *start_push(void *);
+void add_aac_body(unsigned char *bitbuf, int byteslen);
+void add_aac_sequence_header();
+
 };
 
 

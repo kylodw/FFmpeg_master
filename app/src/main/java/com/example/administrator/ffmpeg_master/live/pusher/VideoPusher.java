@@ -63,7 +63,7 @@ public class VideoPusher extends Pusher implements SurfaceHolder.Callback, Camer
             //宽高
             parameters.setPreviewSize(videoParams.getWidth(), videoParams.getHeight());
 //            parameters.setPreviewFpsRange(videoParams.getFps() - 1, videoParams.getFps());
-//            mCamera.setParameters(parameters);
+            mCamera.setParameters(parameters);
             setCameraDisplayOrientation((Activity) context, videoParams.getCameraId(), mCamera);
             mCamera.setPreviewDisplay(holder);
             buffer = new byte[3110400];

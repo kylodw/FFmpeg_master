@@ -5,7 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("CheckResult")
     private void applyPermission() {
         rxPermissions = new RxPermissions(this);
-        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean aBoolean) throws Exception {
@@ -93,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void decodeClick(View view) {
         String folderurl = Environment.getExternalStorageDirectory().getPath();
-        String input = folderurl + "/123.mp4";
-        String output = folderurl + "/output.yuv";
+        String input = folderurl + "/sy.mp4";
+        String output = folderurl + "/output.flv";
         File file = new File(input);
         if (!file.exists()) {
             Toast.makeText(this, "文件不存在" + input, Toast.LENGTH_SHORT).show();
@@ -105,12 +107,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void streamClick(View view) {
-        Toast.makeText(this, "推流得好好整理", Toast.LENGTH_SHORT).show();
-
         String folderurl = Environment.getExternalStorageDirectory().getPath();
-        String input = folderurl + "/test.mp4";
+        String input = folderurl + "/sy.flv";
+        File file = new File(input);
+
+        if (!file.exists()) {
+            Toast.makeText(this, "不存在文件", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String output = "rtmp://47.103.5.187:1935/live/kylodw";
-        decode(input, output);
+        stream(input, output);
 //        Log.e("Main", folderurl);
     }
 
@@ -193,6 +199,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void gotoLive(View view) {
         Intent it = new Intent(this, LiveActivity.class);
+        startActivity(it);
+    }
+
+    public void newCamera2(View view) {
+        Intent it = new Intent(this, Camera2Activity.class);
         startActivity(it);
     }
 }

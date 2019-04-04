@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.view.SurfaceHolder;
 
+import com.example.administrator.ffmpeg_master.live.LiveListener;
 import com.example.administrator.ffmpeg_master.live.LiveUtil;
 import com.example.administrator.ffmpeg_master.live.params.AudioParams;
 import com.example.administrator.ffmpeg_master.live.params.VideoParams;
@@ -43,10 +44,11 @@ public class LivePusher implements SurfaceHolder.Callback {
         videoPusher.switchCamera();
     }
 
-    public void startPush(String url) {
+    public void startPush(String url, LiveListener liveListener) {
         audioPusher.startPush();
         videoPusher.startPush();
         liveUtil.startPush(url);
+        liveUtil.setLiveListener(liveListener);
 
     }
 
@@ -54,6 +56,7 @@ public class LivePusher implements SurfaceHolder.Callback {
         videoPusher.stopPush();
         audioPusher.stopPush();
         liveUtil.stopPush();
+        liveUtil.removeLiveListener();
     }
 
     public void relase() {
