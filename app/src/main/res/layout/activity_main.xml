@@ -102,6 +102,18 @@
                 android:onClick="newCamera2"
                 android:text="新版摄像头"
                 />
+            <Button
+                android:id="@+id/btn_start_audio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="使用AudioRecord录制pcm音频"
+                />
+            <Button
+                android:id="@+id/btn_media"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="视频分离和合成"
+                />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>

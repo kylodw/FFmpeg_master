@@ -10,10 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.ffmpeg_master.audio.AudioRecordActivity;
 import com.example.administrator.ffmpeg_master.live.LiveActivity;
+import com.example.administrator.ffmpeg_master.mediaextractor.MediaExtractorActivity;
 import com.example.administrator.ffmpeg_master.util.CmdUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -26,7 +29,7 @@ import java.io.InputStream;
 
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private RxPermissions rxPermissions;
     public static final String TAG = "MainActivity";
     private PosixThread posixThread;
@@ -49,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rxPermissions = new RxPermissions(this);
 
+        initFindView();
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
         tv.setText(impleStringFromJNI());
@@ -60,9 +65,21 @@ public class MainActivity extends AppCompatActivity {
 //        decode(folderurl + "/" + "test.mp4", folderurl + "/" + "output.yuv");
     }
 
+    private void initFindView() {
+        Button mStartAudio = findViewById(R.id.btn_start_audio);
+        mStartAudio.setOnClickListener(this);
+        Button mMedia = findViewById(R.id.btn_media);
+        mMedia.setOnClickListener(this);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     @SuppressLint("CheckResult")
     private void applyPermission() {
-        rxPermissions = new RxPermissions(this);
         rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
@@ -121,7 +138,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void commandClick(View view) {
-        CmdUtil.getCmd();
+        File file = new File(Environment.getExternalStorageDirectory(), "sy.flv");
+//        File output = new File(Environment.getExternalStorageDirectory() + "/ts", "output.ts");
+        String output = "rtmp://47.103.5.187:1935/live/kylodw";
+        //输出为ts文件
+//        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-vcodec", "copy", "-acodec", "copy", "-f", "mpegts", output.getAbsolutePath()};
+        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-vcodec", "copy", "-acodec", "copy", "-f", "flv", output};
+        ffmpegcore(cmds);
+        Log.e(TAG, "输出完成");
     }
 
     public void video_util_click(View view) {
@@ -184,11 +208,6 @@ public class MainActivity extends AppCompatActivity {
         posixThread.pthread();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     public void pthreadExample2(View view) {
     }
 
@@ -205,5 +224,22 @@ public class MainActivity extends AppCompatActivity {
     public void newCamera2(View view) {
         Intent it = new Intent(this, Camera2Activity.class);
         startActivity(it);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent it = null;
+        switch (v.getId()) {
+            case R.id.btn_start_audio:
+                it = new Intent(MainActivity.this, AudioRecordActivity.class);
+                startActivity(it);
+                break;
+            case R.id.btn_media:
+                it = new Intent(MainActivity.this, MediaExtractorActivity.class);
+                startActivity(it);
+                break;
+            default:
+                break;
+        }
     }
 }
