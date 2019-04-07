@@ -259,7 +259,9 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
     return 0;
 
 }
-
+/**
+ * 推流
+ */
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_example_administrator_ffmpeg_1master_MainActivity_stream(JNIEnv *env, jobject instance,
@@ -344,6 +346,7 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_stream(JNIEnv *env, j
 
     while (1) {
         AVStream *in_stream, *out_stream;
+        //裸流
         ret = av_read_frame(input_f_cxt, &pkt);
         if (ret < 0) {
             break;
@@ -384,7 +387,7 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_stream(JNIEnv *env, j
             LOGE("发送视频帧: %8d", frame_index);
             frame_index++;
         }
-
+        //写入output_cxt
         ret = av_interleaved_write_frame(output_f_cxt, &pkt);
         if (ret < 0) {
             LOGE("%s", "写入帧失败");
