@@ -15,9 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.ffmpeg_master.audio.AudioRecordActivity;
+import com.example.administrator.ffmpeg_master.camera.Camera2Activity;
 import com.example.administrator.ffmpeg_master.live.LiveActivity;
 import com.example.administrator.ffmpeg_master.mediaextractor.MediaExtractorActivity;
-import com.example.administrator.ffmpeg_master.util.CmdUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.ByteArrayOutputStream;
@@ -30,7 +30,7 @@ import java.io.InputStream;
 import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private RxPermissions rxPermissions;
+    private RxPermissions rxPermissions = new RxPermissions(this);
     public static final String TAG = "MainActivity";
     private PosixThread posixThread;
 
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rxPermissions = new RxPermissions(this);
 
         initFindView();
         // Example of a call to a native method
@@ -94,10 +93,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
     public native String stringFromJNI();
 
     public native String impleStringFromJNI();

@@ -24,4 +24,10 @@
         android:layout_height="wrap_content"
         android:onClick="playAudoTrack"
         android:text="以流的形式播放" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="audioConvert"
+        android:text="音频转换"
+        />
 </LinearLayout>
