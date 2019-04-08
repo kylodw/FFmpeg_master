@@ -5,6 +5,8 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 
+import com.example.administrator.ffmpeg_master.util.CodecUtil;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -131,9 +133,9 @@ public class AvcEncoder {
                     if (input != null) {
                         int inputBufferIndex = mMediaCodec.dequeueInputBuffer(0);
                         if (inputBufferIndex >= 0) {
-                            pts = computePresentationTime(generateIndex);
-                            ByteBuffer inputBuffer = mMediaCodec.getInputBuffer(inputBufferIndex);
+                            ByteBuffer inputBuffer = CodecUtil.getInputBuffer(mMediaCodec,inputBufferIndex);
                             inputBuffer.clear();
+                            pts = computePresentationTime(generateIndex);
                             inputBuffer.put(input);
                             mMediaCodec.queueInputBuffer(inputBufferIndex,0,input.length,pts,0);
                             generateIndex += 1;

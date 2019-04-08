@@ -19,40 +19,33 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
-import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.ffmpeg_master.R;
+import com.example.administrator.ffmpeg_master.util.CameraUtil;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class Camera2Activity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
     private TextureView textureView;
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     public static final String TAG = "Camera2Activity";
     private HandlerThread handlerThread;
     private int width;
@@ -71,7 +64,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     private Handler mainHandler;
 
     private CameraCaptureSession cameraCaptureSession;
-    private boolean isPushing = false;
 
 
     @Override
@@ -134,33 +126,39 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
-
-                //照片数据可用时
                 Image image = reader.acquireNextImage();
-                Image.Plane[] planes = image.getPlanes();
-                byte[] dataYUV = null;
-                if (planes.length >= 3) {
-                    ByteBuffer bufferY = planes[0].getBuffer();
-                    ByteBuffer bufferU = planes[1].getBuffer();
-                    ByteBuffer bufferV = planes[2].getBuffer();
-                    int lengthY = bufferY.remaining();
-                    int lengthU = bufferU.remaining();
-                    int lengthV = bufferV.remaining();
-                    dataYUV = new byte[lengthY + lengthU + lengthV];
-                    bufferY.get(dataYUV, 0, lengthY);
-                    bufferU.get(dataYUV, lengthY, lengthU);
-                    bufferV.get(dataYUV, lengthY + lengthU, lengthV);
-                    Log.e("onImageAvailable", "onImageAvailable: data size" + dataYUV.length);
-
-                    if (mAvcEncoder == null) {
-                        mAvcEncoder = new AvcEncoder(mPreviewSize.getWidth(),
-                                mPreviewSize.getHeight(), 30,
-                                CameraUtil.getOutputMediaFile(Camera2Activity.this, MEDIA_TYPE_VIDEO), false);
-                        mAvcEncoder.startEncoderThread();
-                    }
-                    mAvcEncoder.putYUVData(dataYUV);
-                }
+                //将这帧数据转成字节数组，类似于Camera1的PreviewCallback回调的预览帧数据
+                ByteBuffer byteBuffer = image.getPlanes()[0].getBuffer();
+                byte[] data = new byte[byteBuffer.remaining()];
+                    MediaMuxerThread.addVideoFrameData(data);
                 image.close();
+
+//                //照片数据可用时
+//                Image image = reader.acquireNextImage();
+//                Image.Plane[] planes = image.getPlanes();
+//                byte[] dataYUV = null;
+//                if (planes.length >= 3) {
+//                    ByteBuffer bufferY = planes[0].getBuffer();
+//                    ByteBuffer bufferU = planes[1].getBuffer();
+//                    ByteBuffer bufferV = planes[2].getBuffer();
+//                    int lengthY = bufferY.remaining();
+//                    int lengthU = bufferU.remaining();
+//                    int lengthV = bufferV.remaining();
+//                    dataYUV = new byte[lengthY + lengthU + lengthV];
+//                    bufferY.get(dataYUV, 0, lengthY);
+//                    bufferU.get(dataYUV, lengthY, lengthU);
+//                    bufferV.get(dataYUV, lengthY + lengthU, lengthV);
+//                    Log.e("onImageAvailable", "onImageAvailable: data size" + dataYUV.length);
+//
+//                    if (mAvcEncoder == null) {
+//                        mAvcEncoder = new AvcEncoder(mPreviewSize.getWidth(),
+//                                mPreviewSize.getHeight(), 30,
+//                                CameraUtil.getOutputMediaFile(Camera2Activity.this, MEDIA_TYPE_VIDEO), false);
+//                        mAvcEncoder.startEncoderThread();
+//                    }
+//                    mAvcEncoder.putYUVData(dataYUV);
+//                }
+//                image.close();
             }
         }, mainHandler);
     }
@@ -221,15 +219,29 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
 
     public void startPre(View view) {
-        isPushing = true;
+
     }
 
     public void endPre(View view) {
-        isPushing = false;
         mAvcEncoder.stopThread();
     }
 
     public void pict(View view) {
+    }
+
+    private boolean isPushing = false;
+
+    public void MuxerClick(View view) {
+        Button button= (Button) view;
+        if (button.getText().toString().equals("停止")) {
+            button.setText("开始");
+            MediaMuxerThread.stopMuxer();
+            isPushing = false;
+        } else {
+            button.setText("停止");
+            MediaMuxerThread.startMuxer();
+            isPushing = true;
+        }
     }
 
 

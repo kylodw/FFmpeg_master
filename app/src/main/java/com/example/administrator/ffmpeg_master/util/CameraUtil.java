@@ -1,4 +1,4 @@
-package com.example.administrator.ffmpeg_master.camera;
+package com.example.administrator.ffmpeg_master.util;
 
 import android.content.Context;
 import android.os.Environment;
