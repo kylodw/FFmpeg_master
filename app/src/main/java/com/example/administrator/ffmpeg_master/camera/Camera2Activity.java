@@ -19,6 +19,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -33,10 +34,19 @@ import android.widget.Toast;
 import com.example.administrator.ffmpeg_master.R;
 import com.example.administrator.ffmpeg_master.util.CameraUtil;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -100,11 +110,10 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             } else {
                 cameraCharacteristics = cameraManager.getCameraCharacteristics(mCameraID);
             }
-
+            CameraUtil.isHardwareSupported(cameraCharacteristics);
             StreamConfigurationMap configurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mSensorOrientation = cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-            mPreviewSize = CameraUtil.getMinPreSize(configurationMap.getOutputSizes(SurfaceTexture.class)
-                    , width, height, 1000);
+            mPreviewSize = CameraUtil.chooseVideoSize(configurationMap.getOutputSizes(SurfaceTexture.class));
             mCaptureSize = Collections.max(Arrays.asList(configurationMap.getOutputSizes(ImageFormat.JPEG)), new Comparator<Size>() {
                 @Override
                 public int compare(Size lhs, Size rhs) {
@@ -123,15 +132,51 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
     private void initImageReader() {
         imageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 1);
+        Log.e(TAG, "预览的宽高:" + mPreviewSize.getWidth() + "    " + mPreviewSize.getHeight());
         imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
                 Image image = reader.acquireNextImage();
-                //将这帧数据转成字节数组，类似于Camera1的PreviewCallback回调的预览帧数据
-                ByteBuffer byteBuffer = image.getPlanes()[0].getBuffer();
-                byte[] data = new byte[byteBuffer.remaining()];
-                    MediaMuxerThread.addVideoFrameData(data);
-                image.close();
+//                //将这帧数据转成字节数组，类似于Camera1的PreviewCallback回调的预览帧数据
+//                ByteBuffer byteBuffer = image.getPlanes()[0].getBuffer();
+//                byte[] data = new byte[byteBuffer.remaining()];
+//                int len = image.getFormat();
+//                int b = image.getPlanes().length;
+//                Log.e(TAG, "这是什么啊？：" + len + " 多少通道：" + b + "宽高:" + image.getWidth() + "  " + image.getHeight());
+//                ByteBuffer bufferY = image.getPlanes()[0].getBuffer();
+//                ByteBuffer bufferU = image.getPlanes()[1].getBuffer();
+//                ByteBuffer bufferV = image.getPlanes()[2].getBuffer();
+//                Log.e(TAG, "bufferY" + bufferY.remaining());
+//                Log.e(TAG, "bufferU" + bufferU.remaining());
+//                Log.e(TAG, "bufferV" + bufferV.remaining());
+//                dumpFile(FileUtils.getDataFromImage(image, 1));
+//                MediaMuxerThread.addVideoFrameData(FileUtils.getDataFromImage(image, 1));
+//                FileOutputStream fileOutputStream = null;
+//                BufferedOutputStream bufferedOutputStream = null;
+//                try {
+//                    fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "output_byte.yuv"));
+//                    bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+//                    bufferedOutputStream.write(FileUtils.getDataFromImage(image, 1));
+//                    bufferedOutputStream.flush();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    try {
+//                        bufferedOutputStream.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    try {
+//                        fileOutputStream.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                image.close();
+                byte[] yuv420buf = camera2ImageToI420(image);
+                MediaMuxerThread.addVideoFrameData(yuv420buf);
 
 //                //照片数据可用时
 //                Image image = reader.acquireNextImage();
@@ -144,23 +189,87 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 //                    int lengthY = bufferY.remaining();
 //                    int lengthU = bufferU.remaining();
 //                    int lengthV = bufferV.remaining();
-//                    dataYUV = new byte[lengthY + lengthU + lengthV];
-//                    bufferY.get(dataYUV, 0, lengthY);
-//                    bufferU.get(dataYUV, lengthY, lengthU);
-//                    bufferV.get(dataYUV, lengthY + lengthU, lengthV);
-//                    Log.e("onImageAvailable", "onImageAvailable: data size" + dataYUV.length);
 //
-//                    if (mAvcEncoder == null) {
-//                        mAvcEncoder = new AvcEncoder(mPreviewSize.getWidth(),
-//                                mPreviewSize.getHeight(), 30,
-//                                CameraUtil.getOutputMediaFile(Camera2Activity.this, MEDIA_TYPE_VIDEO), false);
-//                        mAvcEncoder.startEncoderThread();
-//                    }
-//                    mAvcEncoder.putYUVData(dataYUV);
+//                    //plane[0]+plane[1]  可以得到NV12
+//                    //plane[0]+plane[2]  可以得到NV21
+//                    dataYUV = new byte[lengthY + lengthV];
+//
+////                    dataYUV = new byte[lengthY + lengthU + lengthV];
+//                    bufferY.get(dataYUV, 0, lengthY);
+//                    bufferV.get(dataYUV, lengthY, lengthV);
+////                    bufferU.get(dataYUV, lengthY, lengthU);
+////                    bufferV.get(dataYUV, lengthY + lengthU, lengthV);
+//                    Log.e("onImageAvailable", "onImageAvailable: data size" + dataYUV.length);
+//                    MediaMuxerThread.addVideoFrameData(dataYUV);
 //                }
-//                image.close();
+                image.close();
+
+
             }
         }, mainHandler);
+    }
+
+
+
+    private byte[] camera2ImageToI420(Image image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        Image.Plane[] planes = image.getPlanes();
+
+        //Y-buffer
+        ByteBuffer yBuffer = planes[0].getBuffer();
+        int ySize = yBuffer.remaining();
+        byte[] yBytes = new byte[ySize];
+        yBuffer.get(yBytes);
+
+        //u-buffer
+        ByteBuffer uBuffer = planes[1].getBuffer();
+        int uSize = uBuffer.remaining();
+        byte[] uBytes = new byte[uSize];
+        uBuffer.get(uBytes);
+
+
+        //v-buffer
+        ByteBuffer vBuffer = planes[2].getBuffer();
+        int vSize = vBuffer.remaining();
+        byte[] vBytes = new byte[vSize];
+        vBuffer.get(vBytes);
+
+
+        byte[] ret = new byte[width * height * 3 / 2];
+        int yLength = yBytes.length;
+        int uLength = uBytes.length + 1;
+        int vLength = vBytes.length + 1;
+
+
+        ByteBuffer bufferY = ByteBuffer.wrap(ret, 0, yLength);
+        ByteBuffer bufferU = ByteBuffer.wrap(ret, yLength, uLength / 2);
+        ByteBuffer bufferV = ByteBuffer.wrap(ret, yLength + uLength / 2, vLength / 2);
+
+        bufferY.put(yBytes, 0, yLength);
+        for (int i = 0; i < uLength; i += 2) {
+            bufferU.put(uBytes[i]);
+        }
+        for (int i = 0; i < vLength; i += 2) {
+            bufferV.put(vBytes[i]);
+        }
+
+
+        return ret;
+    }
+
+    private void dumpFile(byte[] dataFromImage) {
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "dump_file.yuv"));
+            fileOutputStream.write(dataFromImage);
+            fileOutputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -232,14 +341,14 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     private boolean isPushing = false;
 
     public void MuxerClick(View view) {
-        Button button= (Button) view;
+        Button button = (Button) view;
         if (button.getText().toString().equals("停止")) {
             button.setText("开始");
             MediaMuxerThread.stopMuxer();
             isPushing = false;
         } else {
             button.setText("停止");
-            MediaMuxerThread.startMuxer();
+            MediaMuxerThread.startMuxer(mPreviewSize.getWidth(),mPreviewSize.getHeight());
             isPushing = true;
         }
     }
@@ -295,7 +404,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             //默认预览不开启闪光灯
             builder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
             // 自动对焦
-//            builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+            builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 //            builder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             cameraDevice.createCaptureSession(Arrays.asList(surface, imageReader.getSurface()), new CameraCaptureSession.StateCallback() {
                 @Override
@@ -328,5 +437,9 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         super.onResume();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
 }

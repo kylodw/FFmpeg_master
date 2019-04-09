@@ -1,9 +1,11 @@
 package com.example.administrator.ffmpeg_master.camera;
 
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,6 +16,8 @@ import java.util.Vector;
 /**
  * 音视频混合线程
  */
+
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerThread extends Thread {
 
     private static final String TAG = "MediaMuxerThread";
@@ -41,23 +45,31 @@ public class MediaMuxerThread extends Thread {
     private volatile boolean isAudioTrackAdd;
 
     private volatile boolean isExit = false;
+    private int mWidth;
+    private int mHeight;
 
     private MediaMuxerThread() {
         // 构造函数
     }
 
+    public MediaMuxerThread(int width, int height) {
+        mWidth = width;
+        mHeight = height;
+    }
+
     // 开始音视频混合任务
-    public static void startMuxer() {
+    public static void startMuxer(int width, int height) {
         if (mediaMuxerThread == null) {
             synchronized (MediaMuxerThread.class) {
                 if (mediaMuxerThread == null) {
-                    mediaMuxerThread = new MediaMuxerThread();
+                    mediaMuxerThread = new MediaMuxerThread(width, height);
                     Log.e("111", "mediaMuxerThread.start();");
                     mediaMuxerThread.start();
                 }
             }
         }
     }
+
 
     // 停止音视频混合任务
     public static void stopMuxer() {
@@ -201,7 +213,7 @@ public class MediaMuxerThread extends Thread {
         muxerDatas = new Vector<>();
         fileSwapHelper = new FileUtils();
         audioThread = new AudioEncoderThread((new WeakReference<MediaMuxerThread>(this)));
-        videoThread = new VideoEncoderThread(1920, 1080, new WeakReference<MediaMuxerThread>(this));
+        videoThread = new VideoEncoderThread(mWidth, mHeight, new WeakReference<MediaMuxerThread>(this));
         audioThread.start();
         videoThread.start();
         try {

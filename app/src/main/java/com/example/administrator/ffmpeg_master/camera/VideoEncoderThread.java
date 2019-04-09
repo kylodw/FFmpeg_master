@@ -1,10 +1,14 @@
 package com.example.administrator.ffmpeg_master.camera;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.util.Log;
+
+import com.example.administrator.ffmpeg_master.util.CodecUtil;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -14,18 +18,17 @@ import java.util.Vector;
 /**
  * 视频编码线程
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class VideoEncoderThread extends Thread {
 
-    public static final int IMAGE_HEIGHT = 1080;
-    public static final int IMAGE_WIDTH = 1920;
 
     private static final String TAG = "VideoEncoderThread";
 
     // 编码相关参数
     private static final String MIME_TYPE = "video/avc"; // H.264 Advanced Video
     private static final int FRAME_RATE = 25; // 帧率
-    private static final int IFRAME_INTERVAL = 10; // I帧间隔（GOP）
-    private static final int TIMEOUT_USEC = 10000; // 编码超时时间
+    private static final int IFRAME_INTERVAL = 1; // I帧间隔（GOP）
+    private static final int TIMEOUT_USEC = 0; // 编码超时时间
 
     // 视频宽高参数
     private int mWidth;
@@ -36,16 +39,16 @@ public class VideoEncoderThread extends Thread {
     private byte[] mFrameData;
 
     private static final int COMPRESS_RATIO = 256;
-    private static final int BIT_RATE = IMAGE_HEIGHT * IMAGE_WIDTH * 3 * 8 * FRAME_RATE / COMPRESS_RATIO; // bit rate CameraWrapper.
+    private int BIT_RATE;
 
     private final Object lock = new Object();
 
     private MediaCodecInfo mCodecInfo;
-    private MediaCodec mMediaCodec;  // Android硬编解码器
-    private MediaCodec.BufferInfo mBufferInfo; //  编解码Buffer相关信息
+    private MediaCodec mMediaCodec;
+    private MediaCodec.BufferInfo mBufferInfo;
 
-    private WeakReference<MediaMuxerThread> mediaMuxer; // 音视频混合器
-    private MediaFormat mediaFormat; // 音视频格式
+    private WeakReference<MediaMuxerThread> mediaMuxer;
+    private MediaFormat mediaFormat;
 
     private volatile boolean isStart = false;
     private volatile boolean isExit = false;
@@ -58,10 +61,14 @@ public class VideoEncoderThread extends Thread {
         this.mHeight = mHeight;
         this.mediaMuxer = mediaMuxer;
         frameBytes = new Vector<byte[]>();
+//        BIT_RATE=mWidth*mHeight* 3 * 8 * FRAME_RATE / COMPRESS_RATIO;
+        BIT_RATE = mWidth * mHeight * 5;
+        Log.e(TAG, "bitl率：" + mWidth * mHeight * 3 * 8 * FRAME_RATE / COMPRESS_RATIO);
         prepare();
     }
 
     // 执行相关准备工作
+
     private void prepare() {
         Log.i(TAG, "VideoEncoderThread().prepare");
         mFrameData = new byte[this.mWidth * this.mHeight * 3 / 2];
@@ -74,7 +81,8 @@ public class VideoEncoderThread extends Thread {
         mediaFormat = MediaFormat.createVideoFormat(MIME_TYPE, this.mWidth, this.mHeight);
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
-        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
+        //这种颜色格式从来都不是一个确定的格式，只是代表YUV420这一类格式
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
     }
 
@@ -103,6 +111,7 @@ public class VideoEncoderThread extends Thread {
      */
     private void startMediaCodec() throws IOException {
         mMediaCodec = MediaCodec.createByCodecName(mCodecInfo.getName());
+        Log.e("startMediaCodec", "name:" + mCodecInfo.getName());
         mMediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mMediaCodec.start();
         isStart = true;
@@ -184,19 +193,21 @@ public class VideoEncoderThread extends Thread {
      */
     private void encodeFrame(byte[] input) {
         Log.w(TAG, "VideoEncoderThread.encodeFrame()");
+//        yuv420pTo420sp(input, mFrameData, this.mWidth, this.mHeight);
 
         // 将原始的N21数据转为I420
+//        YV12toNV12(input, mFrameData, this.mWidth, this.mHeight);
 //        NV21toI420SemiPlanar(input, mFrameData, this.mWidth, this.mHeight);
-
 //        ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
 //        ByteBuffer[] outputBuffers = mMediaCodec.getOutputBuffers();
+//        input = nv21ToI420(input, this.mWidth, this.mHeight);
 
         int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
         if (inputBufferIndex >= 0) {
-            ByteBuffer inputBuffer = mMediaCodec.getInputBuffer(inputBufferIndex);
+            ByteBuffer inputBuffer = CodecUtil.getInputBuffer(mMediaCodec, inputBufferIndex);
             inputBuffer.clear();
-            inputBuffer.put(mFrameData);
-            mMediaCodec.queueInputBuffer(inputBufferIndex, 0, mFrameData.length, System.nanoTime() / 1000, 0);
+            inputBuffer.put(input);
+            mMediaCodec.queueInputBuffer(inputBufferIndex, 0, input.length, System.nanoTime() / 1000, 0);
         } else {
             Log.e(TAG, "input buffer not available");
         }
@@ -206,7 +217,7 @@ public class VideoEncoderThread extends Thread {
         do {
             if (outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
             } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-               Log.e(TAG,"进入INFO_OUTPUT_BUFFERS_CHANGED");
+                Log.e(TAG, "进入INFO_OUTPUT_BUFFERS_CHANGED");
             } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat newFormat = mMediaCodec.getOutputFormat();
                 MediaMuxerThread mediaMuxerRunnable = this.mediaMuxer.get();
@@ -217,7 +228,7 @@ public class VideoEncoderThread extends Thread {
                 Log.e(TAG, "outputBufferIndex < 0");
             } else {
                 Log.d(TAG, "perform encoding");
-                ByteBuffer outputBuffer = mMediaCodec.getOutputBuffer(outputBufferIndex);
+                ByteBuffer outputBuffer = CodecUtil.getOutputBuffer(mMediaCodec, outputBufferIndex);
                 if (outputBuffer == null) {
                     throw new RuntimeException("encoderOutputBuffer " + outputBufferIndex + " was null");
                 }
@@ -270,4 +281,46 @@ public class VideoEncoderThread extends Thread {
         }
     }
 
+    private void yuv420pTo420sp(byte[] yuv420p, byte[] yuv420sp, int width, int height) {
+        if (yuv420p == null || yuv420sp == null) return;
+        int frameSize = width * height;
+        int j;
+        System.arraycopy(yuv420p, 0, yuv420sp, 0, frameSize);
+        for (j = 0; j < frameSize / 4; j++) {
+            // u
+            yuv420sp[frameSize + 2 * j] = yuv420p[j + frameSize];
+            // v
+            yuv420sp[frameSize + 2 * j + 1] = yuv420p[(int) (j + frameSize * 1.25)];
+        }
+    }
+
+    private void YV12toNV12(byte[] yv12bytes, byte[] nv12bytes, int width, int height) {
+
+        int nLenY = width * height;
+        int nLenU = nLenY / 4;
+
+
+        System.arraycopy(yv12bytes, 0, nv12bytes, 0, width * height);
+        for (int i = 0; i < nLenU; i++) {
+            nv12bytes[nLenY + 2 * i] = yv12bytes[nLenY + i];
+            nv12bytes[nLenY + 2 * i + 1] = yv12bytes[nLenY + nLenU + i];
+        }
+    }
+
+    public static byte[] nv21ToI420(byte[] data, int width, int height) {
+        byte[] ret = new byte[data.length];
+        int total = width * height;
+
+        ByteBuffer bufferY = ByteBuffer.wrap(ret, 0, total);
+        ByteBuffer bufferU = ByteBuffer.wrap(ret, total, total / 4);
+        ByteBuffer bufferV = ByteBuffer.wrap(ret, total + total / 4, total / 4);
+
+        bufferY.put(data, 0, total);
+        for (int i = total; i < data.length; i += 2) {
+            bufferV.put(data[i]);
+            bufferU.put(data[i + 1]);
+        }
+
+        return ret;
+    }
 }

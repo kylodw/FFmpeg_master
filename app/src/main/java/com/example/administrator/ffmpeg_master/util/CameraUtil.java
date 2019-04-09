@@ -1,6 +1,7 @@
 package com.example.administrator.ffmpeg_master.util;
 
 import android.content.Context;
+import android.hardware.camera2.CameraCharacteristics;
 import android.os.Environment;
 import android.util.Log;
 import android.util.Size;
@@ -53,7 +54,14 @@ public class CameraUtil {
         }
         return retSize;
     }
-
+    public static Size chooseVideoSize(Size[] choices) {
+        for (Size size : choices) {
+            if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080) {
+                return size;
+            }
+        }
+        return choices[choices.length - 1];
+    }
     // 通过对比得到与宽高比最接近的尺寸（如果有相同尺寸，优先选择，activity我们已经固定了方向，所以这里无需在做判断
     protected static Size getCloselyPreSize(Size[] sizeMap, int surfaceWidth, int surfaceHeight) {
         int ReqTmpWidth;
@@ -107,5 +115,26 @@ public class CameraUtil {
         }
         return file;
     }
-
+    public static int isHardwareSupported(CameraCharacteristics characteristics) {
+        Integer deviceLevel = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+        if (deviceLevel == null) {
+            Log.e("isHardwareSupported", "can not get INFO_SUPPORTED_HARDWARE_LEVEL");
+            return -1;
+        }
+        switch (deviceLevel) {
+            case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL:
+                Log.w("isHardwareSupported", "hardware supported level:LEVEL_FULL");
+                break;
+            case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY:
+                Log.w("isHardwareSupported", "hardware supported level:LEVEL_LEGACY");
+                break;
+            case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3:
+                Log.w("isHardwareSupported", "hardware supported level:LEVEL_3");
+                break;
+            case CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED:
+                Log.w("isHardwareSupported", "hardware supported level:LEVEL_LIMITED");
+                break;
+        }
+        return deviceLevel;
+    }
 }
