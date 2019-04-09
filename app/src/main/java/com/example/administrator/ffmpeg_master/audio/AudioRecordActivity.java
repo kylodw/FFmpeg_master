@@ -268,7 +268,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
                     } else {
                         ByteBuffer outputBuffer;
-                        if (Build.VERSION.SDK_INT >= 21){
+                        if (Build.VERSION.SDK_INT >= 21) {
                             outputBuffer = mediaCodec.getOutputBuffer(outputIndex);
                         } else {
                             outputBuffer = outputBuffers[outputIndex];
@@ -370,7 +370,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 while (outputIndex >= 0) {
                     outBitSize = bufferInfo.size;
                     outPacketSize = outBitSize + 7;
-                    outputBuffer=encodeOutputBuffers[outputIndex];
+                    outputBuffer = encodeOutputBuffers[outputIndex];
                     outputBuffer.position(bufferInfo.offset);
                     outputBuffer.limit(bufferInfo.offset + outBitSize);
 
@@ -417,5 +417,11 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     public void audioConvert(View view) {
         getPCMFormAudio();
+    }
+
+    public void pcmConvertToWav(View view) {
+        PcmToWavUtil pcmToWavUtil = new PcmToWavUtil(SAMPLE_RATE_INHZ, CHANNEL_CONFIG, AudioFormat.ENCODING_PCM_16BIT);
+        String saveWavFilePath = Environment.getExternalStorageDirectory() + "/pcm_to_wav.wav";
+        pcmToWavUtil.pcmToWav(file.getAbsolutePath(), saveWavFilePath);
     }
 }

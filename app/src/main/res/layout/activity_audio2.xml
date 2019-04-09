@@ -30,4 +30,10 @@
         android:layout_height="wrap_content"
         android:onClick="audioConvert"
         android:text="音频转换将一个mp3文件分离成pcm和m4a" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="pcmConvertToWav"
+        android:text="将一个pcm文件改成wav文件（pcm文件可以通过录制声音来生成默认为audio.pcm）"
+        />
 </LinearLayout>
