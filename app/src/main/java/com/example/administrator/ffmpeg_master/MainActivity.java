@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run() {
                 String folderurl = Environment.getExternalStorageDirectory().getPath();
-                String input = folderurl + "/sy.flv";
+                String input = folderurl + "/output_flv.flv";
                 File file = new File(input);
 
                 if (!file.exists()) {
@@ -133,13 +133,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    //    rtmp://202.69.69.180:443/webcast/bshdlive-pc
     public void commandClick(View view) {
-        File file = new File(Environment.getExternalStorageDirectory(), "sy.flv");
+//        File file = new File(Environment.getExternalStorageDirectory(), "huge.mp4");
+
 //        File output = new File(Environment.getExternalStorageDirectory() + "/ts", "output.ts");
-        String output = "rtmp://47.103.5.187:1935/live/kylodw";
-        //输出为ts文件
-//        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-vcodec", "copy", "-acodec", "copy", "-f", "mpegts", output.getAbsolutePath()};
-        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-vcodec", "copy", "-acodec", "copy", "-f", "flv", output};
+//        String output = "rtmp://47.103.5.187:1935/live/kylodw";
+        File outputFile = new File(Environment.getExternalStorageDirectory(), "output_flv.flv");
+//        ffmpeg -re -i 好汉歌.mp4 -c copy -f hls -bsf:v h264_mp4toannexb output.m3u8
+//        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-vcodec", "copy", "-acodec", "copy", "-f", "mpegts", output.getAbsolutePath()};//输出为ts文件
+//        String[] cmds = {"ffmpeg", "-i", file.getAbsolutePath(), "-vcodec", "copy", "-acodec", "copy", "-f", "flv", output};  //推流
+        //可以通过这个down flv格式的视频
+        String[] cmds = {"ffmpeg", "-i", "rtmp://202.69.69.180:443/webcast/bshdlive-pc", "-acodec", "copy", "-vcodec", "copy", "-f", "flv", outputFile.getAbsolutePath()};
         ffmpegcore(cmds);
         Log.e(TAG, "输出完成");
     }

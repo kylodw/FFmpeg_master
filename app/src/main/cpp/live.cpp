@@ -208,33 +208,39 @@ void add_264_body(unsigned char *buffer, int len) {
         buffer += 3;
         len -= 3;
     }
+
+
     RTMPPacket *rtmpPacket = (RTMPPacket *) (malloc(sizeof(RTMPPacket)));
-    int size = len + 9;
-    RTMPPacket_Alloc(rtmpPacket, static_cast<uint32_t>(size));
-//    RTMPPacket_Reset(rtmpPacket);
+    int bodySize = len + 9;
+    RTMPPacket_Alloc(rtmpPacket, static_cast<uint32_t>(bodySize));
+    RTMPPacket_Reset(rtmpPacket);
 
     unsigned char *body = reinterpret_cast<unsigned char *>(rtmpPacket->m_body);
+
     //头信息与上type  获得type
     int type = buffer[0] & 0x1f;
     LOGE("buffer 0位：%c", buffer[0]);
-    body[0] = 0x27; //frame_type  2      2，interframe  帧间压缩
+    int i=0;
     if (type == NAL_SLICE_IDR) {  //NAL头信息中后五位，也就是type的5位等于5 进入方法体
-        body[0] = 0x17;   //1 ,innerframe  关键帧  帧内压缩
+        body[i++] = 0x17;   //1 ,innerframe  关键帧  帧内压缩
+    } else{
+        body[i++] = 0x27; //frame_type  2      2，interframe  帧间压缩
     }
-    body[1] = 0x01;
-    body[2] = 0x00;
-    body[3] = 0x00;
-    body[4] = 0x00;
+    //fixed 4byte   0x01表示NALU单元
+    body[i++] = 0x01;
+    body[i++] = 0x00;
+    body[i++] = 0x00;
+    body[i++] = 0x00;
 
-    body[5] = static_cast<unsigned char>((len >> 24) & 0xff);
-    body[6] = static_cast<unsigned char>((len >> 16) & 0xff);
-    body[7] = static_cast<unsigned char>((len >> 8) & 0xff);
-    body[8] = static_cast<unsigned char>((len) & 0xff);
+    body[i++] = static_cast<unsigned char>((len >> 24) & 0xff);
+    body[i++] = static_cast<unsigned char>((len >> 16) & 0xff);
+    body[i++] = static_cast<unsigned char>((len >> 8) & 0xff);
+    body[i++] = static_cast<unsigned char>((len) & 0xff);
 
-    memcpy(&body[9], buffer, len);
+    memcpy(&body[i], buffer, len);
 
     rtmpPacket->m_packetType = RTMP_PACKET_TYPE_VIDEO;
-    rtmpPacket->m_nBodySize = (uint32_t) (size);
+    rtmpPacket->m_nBodySize = (uint32_t) (bodySize);
     rtmpPacket->m_nTimeStamp = RTMP_GetTime() - start_time;
     rtmpPacket->m_hasAbsTimestamp = 0;
     rtmpPacket->m_nChannel = 0x04; //音视频通道
@@ -248,17 +254,21 @@ void add_264_body(unsigned char *buffer, int len) {
  */
 void add_264_sequence_header(unsigned char *pps, unsigned char *sps, int pps_len, int sps_len) {
     int body_size = 16 + sps_len + pps_len;  //16 H264的标准配置SPS,PPS ，需要16个字节的配置
+
     RTMPPacket *rtmpPacket = (RTMPPacket *) (malloc(sizeof(RTMPPacket)));
     LOGE("body_size %d", body_size);
     RTMPPacket_Alloc(rtmpPacket, static_cast<uint32_t>(body_size));
     RTMPPacket_Reset(rtmpPacket);
 
     unsigned char *body = reinterpret_cast<unsigned char *>(rtmpPacket->m_body);
+
+
     int i = 0;
     //H264的配置
-    body[i++] = 0x17;//FrameType，4bit，帧类型  AVC都可以兼容 （1-keyframe+codeId-7）
+    body[i++] = 0x17;//FrameType，4bit，帧类型  AVC都可以兼容 （1-keyframe+codeId-7）IFrame, 7: AVC
+
+    //AVC Sequence Header
     body[i++] = 0x00;
-    //time
     body[i++] = 0x00;
     body[i++] = 0x00;
     body[i++] = 0x00;
@@ -282,7 +292,6 @@ void add_264_sequence_header(unsigned char *pps, unsigned char *sps, int pps_len
     body[i++] = static_cast<unsigned char>((pps_len >> 8) & 0xff);
     body[i++] = static_cast<unsigned char>((pps_len) & 0xff);
     memcpy(&body[i], pps, static_cast<size_t>(pps_len));
-    i += pps_len;
 
     //rtmp协议数据（Message）协议头信息赋值
 

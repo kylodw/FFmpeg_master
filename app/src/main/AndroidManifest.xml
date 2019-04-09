@@ -35,6 +35,7 @@
         <activity android:name=".audio.AudioRecordActivity" />
         <activity android:name=".mediaextractor.MediaExtractorActivity" />
         <activity android:name=".gles.MyGLSurfaceActivity" />
+        <activity android:name=".OpenSlEsActivity"></activity>
     </application>
 
 </manifest>
