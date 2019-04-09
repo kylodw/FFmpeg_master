@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="startRecording"
-        android:text="开始录制" />
+        android:text="开始录制麦克风声音" />
 
     <Button
         android:layout_width="match_parent"
@@ -23,11 +23,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="playAudoTrack"
-        android:text="以流的形式播放" />
+        android:text="利用AudioTrack以流的形式播放" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="audioConvert"
-        android:text="音频转换"
-        />
+        android:text="音频转换将一个mp3文件分离成pcm和m4a" />
 </LinearLayout>

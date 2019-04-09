@@ -43,14 +43,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="decodeClick"
-                android:text="解码" />
+                android:text="本地文件转换格式（mp4->flv）" />
 
             <Button
                 android:id="@+id/btn_push"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="streamClick"
-                android:text="推流"
+                android:text="本地文件推流至流媒体服务器"
                 app:layout_constraintTop_toBottomOf="@+id/btn_decode" />
 
             <Button
@@ -58,62 +58,62 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="commandClick"
-                android:text="cmd"
+                android:text="ffmpeg cmd 命令"
                 app:layout_constraintTop_toBottomOf="@+id/btn_push" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="video_util_click"
-                android:text="video_util" />
+                android:text="video_util（暂未实现）" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="gotoSurface"
-                android:text="进入surface_view" />
+                android:text="进入surface_view解出视频帧播放" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="gotoAudio"
-                android:text="去音频解码" />
+                android:text="解码出音频帧播放" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="JNI多线程示例"
                 android:onClick="pthreadExample"
-                />
+                android:text="JNI多线程示例" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="多线程解码音视频"
                 android:onClick="gotoMultThread"
-                />
+                android:text="多线程解码音视频" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="音视频采集"
                 android:onClick="gotoLive"
-                />
+                android:text="音视频采集（直播流媒体）" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="newCamera2"
-                android:text="新版摄像头"
-                />
+                android:text="新版摄像头内含录制小视频，不过还有点问题" />
+
             <Button
                 android:id="@+id/btn_start_audio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="使用AudioRecord录制pcm音频"
-                />
+                android:text="使用AudioRecord录制pcm音频" />
+
             <Button
                 android:id="@+id/btn_media"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="视频分离和合成"
-                />
+                android:text="视频分离和合成" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>

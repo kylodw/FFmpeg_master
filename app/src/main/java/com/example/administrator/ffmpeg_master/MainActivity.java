@@ -60,8 +60,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         UUIDUtils.get();
         applyPermission();
         posixThread = new PosixThread();
-
-//        decode(folderurl + "/" + "test.mp4", folderurl + "/" + "output.yuv");
     }
 
     private void initFindView() {
@@ -107,29 +105,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void decodeClick(View view) {
         String folderurl = Environment.getExternalStorageDirectory().getPath();
-        String input = folderurl + "/sy.mp4";
-        String output = folderurl + "/output.flv";
+        String input = folderurl + "/huge.mp4";
+        String output = folderurl + "/output_huge.flv";
         File file = new File(input);
         if (!file.exists()) {
             Toast.makeText(this, "文件不存在" + input, Toast.LENGTH_SHORT).show();
             return;
         }
         decode(input, output);
-        Log.e("Main", folderurl);
     }
 
     public void streamClick(View view) {
-        String folderurl = Environment.getExternalStorageDirectory().getPath();
-        String input = folderurl + "/sy.flv";
-        File file = new File(input);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String folderurl = Environment.getExternalStorageDirectory().getPath();
+                String input = folderurl + "/sy.flv";
+                File file = new File(input);
 
-        if (!file.exists()) {
-            Toast.makeText(this, "不存在文件", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String output = "rtmp://47.103.5.187:1935/live/kylodw";
-        stream(input, output);
-//        Log.e("Main", folderurl);
+                if (!file.exists()) {
+                    Toast.makeText(MainActivity.this, "不存在文件", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String output = "rtmp://47.103.5.187:1935/live/kylodw";
+                stream(input, output);
+            }
+        }).start();
     }
 
     public void commandClick(View view) {

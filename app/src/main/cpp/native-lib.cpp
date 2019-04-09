@@ -87,8 +87,6 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
     char input_str[500] = {0};
     char output_str[500] = {0};
     char info[1000] = {0};
-    sprintf(input_str, "%s", env->GetStringUTFChars(input_jstr, NULL));
-    sprintf(output_str, "%s", env->GetStringUTFChars(output_jstr, NULL));
 
     //FFmpeg av_log() callback
     av_log_set_callback(custom_log);
@@ -146,15 +144,6 @@ Java_com_example_administrator_ffmpeg_1master_MainActivity_decode(JNIEnv *env, j
     img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
                                      pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_YUV420P,
                                      SWS_BICUBIC, NULL, NULL, NULL);
-
-
-//    sprintf(info, "[Input     ]%s\n", input_str);
-//    sprintf(info, "%s[Output    ]%s\n", info, output_str);
-//    sprintf(info, "%s[Format    ]%s\n", info, pFormatCtx->iformat->name);
-//    sprintf(info, "%s[Codec     ]%s\n", info, pCodecCtx->codec->name);
-//    sprintf(info, "%s[Resolution]%dx%d\n", info, pCodecCtx->width, pCodecCtx->height);
-
-
     fp_yuv = fopen(output_str, "wb+");
     if (fp_yuv == NULL) {
         printf("Cannot open output file.\n");
