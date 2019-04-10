@@ -1,5 +1,6 @@
 package com.example.administrator.ffmpeg_master.camera;
 
+import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaCodec;
@@ -7,6 +8,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.nio.ByteBuffer;
  * 音频编码线程
  * Created by renhui on 2017/9/25.
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class AudioEncoderThread extends Thread {
 
     public static final String TAG = "AudioEncoderThread";

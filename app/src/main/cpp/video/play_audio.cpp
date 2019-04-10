@@ -128,7 +128,7 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
     if (audio != NULL) {
         int buffer_size = audio->resample_audio();
         if (buffer_size > 0) {
-            (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, audio->buffer,
+            (*bf)->Enqueue(bf, audio->buffer,
                                               static_cast<SLuint32>(buffer_size));
 
         }
@@ -147,7 +147,7 @@ void play_audio::init_open_sles() {
     //第二部，设置混音器
     const SLInterfaceID mids[1] = {SL_IID_ENVIRONMENTALREVERB};
     const SLboolean mrep[1] = {SL_BOOLEAN_FALSE};
-
+    //创建混音器
     (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, mids, mrep);
     (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
     (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB, &outputMixEnvReb);
@@ -163,7 +163,6 @@ void play_audio::init_open_sles() {
                                    SL_BYTEORDER_LITTLEENDIAN};
 
     SLDataSource dataSource = {&android_queue, &format_pcm};
-
     SLDataLocator_OutputMix outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
 
     SLDataSink dataSink = {&outputMix, NULL};
@@ -173,19 +172,21 @@ void play_audio::init_open_sles() {
 
     (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlay, &dataSource, &dataSink, 1, ids, req);
     (*pcmPlay)->Realize(pcmPlay, SL_BOOLEAN_FALSE);
-    (*pcmPlay)->GetInterface(pcmPlay, SL_IID_PLAY, &pcmPlayerPlay);
-
+// 7.获得缓冲区队列接口Buffer Queue Interface
+    //通过缓冲区队列接口对缓冲区进行排序播放
+    (*pcmPlay)->GetInterface(pcmPlay, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
     //设置缓冲队列和回调函数
     //SLBufferQueueItf self,
 //    slBufferQueueCallback callback = NULL;
-    (*pcmPlay)->GetInterface(pcmPlay, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
+// 8.注册音频播放器回调函数
     (*pcmBufferQueue)->RegisterCallback(pcmBufferQueue, pcmBufferCallBack, this);
-
-
+    //9.获取Play Interface通过对SetPlayState函数来启动播放音乐
+    //一旦播放器被设置为播放状态，该音频播放器开始等待缓冲区排队就绪
+    (*pcmPlay)->GetInterface(pcmPlay, SL_IID_PLAY, &pcmPlayerPlay);
     //设置播放状态
     (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PLAYING);
 
-
+    //10.开始，让第一个缓冲区入队
     pcmBufferCallBack(pcmBufferQueue, this);
 
 }

@@ -1,5 +1,6 @@
 package com.example.administrator.ffmpeg_master.live;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +42,7 @@ public class LiveActivity extends AppCompatActivity implements LiveListener {
         mTv4 = findViewById(R.id.tv_4);
     }
 
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -72,6 +74,7 @@ public class LiveActivity extends AppCompatActivity implements LiveListener {
                 case 109:
 //                    进入RTMP_EnableWrite
                     break;
+                    default:break;
             }
         }
     };
