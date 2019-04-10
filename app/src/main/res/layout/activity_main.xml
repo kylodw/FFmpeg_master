@@ -114,6 +114,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="视频分离和合成" />
+
+            <Button
+                android:id="@+id/btn_goto_audio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FFmpeg解码音频再次练习" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>

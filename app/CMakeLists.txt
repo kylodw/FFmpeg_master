@@ -33,8 +33,23 @@ add_library( # Sets the name of the library.
         src/main/cpp/c_k_pthread.cpp
         src/main/jni/mathematics.c
         src/main/cpp/java_vm.cpp
-
+        src/main/cpp/video/k_play.cpp
+        src/main/cpp/video/play_call_java.cpp
+        src/main/cpp/video/play_ffmpeg.cpp
+        src/main/cpp/video/play_audio.cpp
+        src/main/cpp/video/play_queue.cpp
+        src/main/cpp/video/play_status.cpp
         )
+#add_library(
+#        k_play
+#
+#        SHARED
+#
+#        src/main/cpp/java_vm.cpp
+#        src/main/jni/ffmpeg_filter.c
+#        src/main/jni/ffmpeg_mod.c
+#        src/main/jni/ffmpeg_opt.c
+#)
 
 
 #FFmpeg配置目录
@@ -163,7 +178,7 @@ include_directories(src/main/jniLibs/include)
 include_directories(src/main/jniLibs/include/other)
 include_directories(src/main/jniLibs/include/yuv)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #add_definitions(-Wall)
 
 
@@ -174,7 +189,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #    message(STATUS "optional:-std=c++11")
 #endif(CMAKE_COMPILER_IS_GUNCXX)
 
-add_compile_options(-w)
+#add_compile_options(-w)
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -193,9 +208,10 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
         #连接额外的ffmpeg
 
-        native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv x264 faac rtmp
+        native-lib  avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv x264 faac rtmp
         # Links the target library to the log library
         # included in the NDK.
         -landroid # Add this.
+
         ${log-lib}
         )

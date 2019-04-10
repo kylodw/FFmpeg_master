@@ -105,7 +105,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     public void playAudoTrack(View view) {
         initAudioTtack();
-        file = new File(Environment.getExternalStorageDirectory(), "audio.pcm");
+        file = new File(Environment.getExternalStorageDirectory(), "play_audio.pcm");
         audioTrack.play();
         try {
             final FileInputStream fileInputStream = new FileInputStream(file);

@@ -61,3 +61,8 @@ time_base 时间单位
   - 4字节起始码 
   - header头 1字节
   - payload
+  
+  
+### 常用命令
+播放 双通道 32K 的 PCM 音频数据
+ffplay -f s16le -ar 32000 -ac 2 test.pcm

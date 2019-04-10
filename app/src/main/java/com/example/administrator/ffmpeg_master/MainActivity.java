@@ -18,6 +18,7 @@ import com.example.administrator.ffmpeg_master.audio.AudioRecordActivity;
 import com.example.administrator.ffmpeg_master.camera.Camera2Activity;
 import com.example.administrator.ffmpeg_master.live.LiveActivity;
 import com.example.administrator.ffmpeg_master.mediaextractor.MediaExtractorActivity;
+import com.example.administrator.ffmpeg_master.video.VideoActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.ByteArrayOutputStream;
@@ -67,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mStartAudio.setOnClickListener(this);
         Button mMedia = findViewById(R.id.btn_media);
         mMedia.setOnClickListener(this);
-
+        Button button=findViewById(R.id.btn_goto_audio);
+        button.setOnClickListener(this);
     }
 
     @Override
@@ -237,6 +239,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_media:
                 it = new Intent(MainActivity.this, MediaExtractorActivity.class);
+                startActivity(it);
+                break;
+            case R.id.btn_goto_audio:
+                it = new Intent(MainActivity.this, VideoActivity.class);
                 startActivity(it);
                 break;
             default:

@@ -29,13 +29,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MultThreadActivity" />
+        <activity
+            android:name=".MultThreadActivity"
+            android:screenOrientation="landscape" />
         <activity android:name=".live.LiveActivity" />
         <activity android:name=".camera.Camera2Activity" />
         <activity android:name=".audio.AudioRecordActivity" />
         <activity android:name=".mediaextractor.MediaExtractorActivity" />
         <activity android:name=".gles.MyGLSurfaceActivity" />
-        <activity android:name=".OpenSlEsActivity"></activity>
+        <activity android:name=".OpenSlEsActivity" />
+        <activity android:name=".video.VideoActivity"></activity>
     </application>
 
 </manifest>

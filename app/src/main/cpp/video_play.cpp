@@ -11,7 +11,7 @@
 //AVFormatContext 封装格式上下文->AVStream[0]视频流->AVCodecContext解码器上下文->AVCodec解码器
 //AVStream[1]
 //todo 这里需要改变
-#define PACKET_QUEUE_SIZE 500
+#define PACKET_QUEUE_SIZE 50
 #define AUDIO_TIME_ADJUST_US -20000011
 #define MIN_SlEEP_TIME_US  130011
 //100011
@@ -95,8 +95,8 @@ void player_wait_for_frame(Player *player, int64_t stream_time, int stream_no) {
         long timeout_ms = static_cast<long>(sleep_time / 100011); // wait time 100ms
         gettimeofday(&now, NULL);
         long nsec = now.tv_usec * 1000 + (timeout_ms % 1000) * 1000000;
-        abstime.tv_sec=now.tv_sec + nsec / 1000000000 + timeout_ms / 1000;
-        abstime.tv_nsec=nsec % 1000000000;
+        abstime.tv_sec = now.tv_sec + nsec / 1000000000 + timeout_ms / 1000;
+        abstime.tv_nsec = nsec % 1000000000;
         pthread_cond_timedwait(&player->cond, &player->mutex, &abstime);
 
 //        struct timespec *_timespec;
@@ -111,7 +111,7 @@ void decode_video(Player *player, AVPacket *avPacket) {
     AVFormatContext *formatContext = player->input_format_context;
     AVStream *stream = formatContext->streams[player->video_stream_index];
     AVCodecContext *codecContext = player->input_codec_context[player->video_stream_index];
-    int  got_frame= 0;
+    int got_frame = 0;
     //像素数据（解码数据）
     AVFrame *avFrame = av_frame_alloc();
     AVFrame *rgbFrame = av_frame_alloc();
@@ -122,7 +122,7 @@ void decode_video(Player *player, AVPacket *avPacket) {
     //绘制时的缓冲区
     ANativeWindow_Buffer outBuffer;
 
-     avcodec_decode_video2(codecContext, avFrame, &got_frame, avPacket);
+    avcodec_decode_video2(codecContext, avFrame, &got_frame, avPacket);
     //非零，正在解码
     if (got_frame) {
         //AudioTrack.writePCM数据
@@ -131,6 +131,7 @@ void decode_video(Player *player, AVPacket *avPacket) {
         //最终缓冲区的数据  surface_view
         ANativeWindow_setBuffersGeometry(player->nativeWindow, codecContext->width,
                                          codecContext->height, WINDOW_FORMAT_RGBA_8888);
+        LOGE("视频的宽和高22：%d %d", codecContext->width, codecContext->height);
         ANativeWindow_lock(player->nativeWindow, &outBuffer, NULL);
         //fix buffer  要转换成RGBA_8888  YUV
         //设置yuv缓冲区属性宽高等等，像素格式
@@ -139,6 +140,7 @@ void decode_video(Player *player, AVPacket *avPacket) {
         //关联了surface的缓冲区
         avpicture_fill((AVPicture *) (rgbFrame), (uint8_t *) (outBuffer.bits), AV_PIX_FMT_RGBA,
                        codecContext->width, codecContext->height);
+        LOGE("视频的宽和高：%d %d", codecContext->width, codecContext->height);
 
         //YUV_RGBA8888
         int result = I420ToARGB(avFrame->data[0], avFrame->linesize[0],

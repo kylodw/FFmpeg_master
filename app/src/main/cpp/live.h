@@ -6,6 +6,10 @@
 
 #ifndef FFMPEG_MASTER_LIVE_H
 #define FFMPEG_MASTER_LIVE_H
+
+
+
+
 extern "C" {
 #include <rtmp/rtmp.h>
 #include <pthread.h>
