@@ -20,7 +20,7 @@ play_audio::play_audio(play_status *ps) {
 
 void *decode_play(void *data) {
     play_audio *audio = static_cast<play_audio *>(data);
-    audio->resample_audio();
+    audio->init_open_sles();
     pthread_exit(&audio->sampling_thread);
 }
 
@@ -85,7 +85,7 @@ int play_audio::resample_audio() {
             int nbs = swr_convert(swr_context,
                                   &buffer,//转码pcm的数据大小
                                   frame->nb_samples,//输出的采样个数
-                    (const uint8_t **)(frame->data),
+                                  (const uint8_t **) (frame->data),
                                   frame->nb_samples
             );
 
@@ -118,4 +118,74 @@ int play_audio::resample_audio() {
     }
     fclose(out_file);
     return data_size;
+}
+
+static const SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
+
+
+void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
+    play_audio *audio = (play_audio *) context;
+    if (audio != NULL) {
+        int buffer_size = audio->resample_audio();
+        if (buffer_size > 0) {
+            (*audio->pcmBufferQueue)->Enqueue(audio->pcmBufferQueue, audio->buffer,
+                                              static_cast<SLuint32>(buffer_size));
+
+        }
+    } else {
+    }
+}
+
+void play_audio::init_open_sles() {
+    //第一步创建引擎
+    slCreateEngine(&engineObject, 0, 0, 0, 0, 0);
+
+    (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+
+    (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+
+    //第二部，设置混音器
+    const SLInterfaceID mids[1] = {SL_IID_ENVIRONMENTALREVERB};
+    const SLboolean mrep[1] = {SL_BOOLEAN_FALSE};
+
+    (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, mids, mrep);
+    (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB, &outputMixEnvReb);
+
+    (*outputMixEnvReb)->SetEnvironmentalReverbProperties(outputMixEnvReb, &reverbSettings);
+
+    //创建播放器
+    SLDataLocator_AndroidSimpleBufferQueue android_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
+                                                            2};
+    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
+                                   SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+                                   SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
+                                   SL_BYTEORDER_LITTLEENDIAN};
+
+    SLDataSource dataSource = {&android_queue, &format_pcm};
+
+    SLDataLocator_OutputMix outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+
+    SLDataSink dataSink = {&outputMix, NULL};
+
+    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
+    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
+
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlay, &dataSource, &dataSink, 1, ids, req);
+    (*pcmPlay)->Realize(pcmPlay, SL_BOOLEAN_FALSE);
+    (*pcmPlay)->GetInterface(pcmPlay, SL_IID_PLAY, &pcmPlayerPlay);
+
+    //设置缓冲队列和回调函数
+    //SLBufferQueueItf self,
+//    slBufferQueueCallback callback = NULL;
+    (*pcmPlay)->GetInterface(pcmPlay, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
+    (*pcmBufferQueue)->RegisterCallback(pcmBufferQueue, pcmBufferCallBack, this);
+
+
+    //设置播放状态
+    (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PLAYING);
+
+
+    pcmBufferCallBack(pcmBufferQueue, this);
+
 }
