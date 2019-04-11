@@ -9,8 +9,11 @@
 class play_status {
 public:
     bool  exit;
+    bool seeking;
 public:
     play_status();
+
+
 };
 
 

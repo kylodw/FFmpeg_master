@@ -1,5 +1,7 @@
 package com.example.administrator.ffmpeg_master.video;
 
+import android.util.Log;
+
 /**
  * @Author kylodw
  * @Description:
@@ -20,6 +22,7 @@ public class JfPlayer {
     }
 
     private String source;
+    private int flags = -1;
     private JfOnPreparedListener jfOnPreparedListener;
 
     public void setSource(String source) {
@@ -30,17 +33,41 @@ public class JfPlayer {
         this.jfOnPreparedListener = jfOnPreparedListener;
     }
 
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+
+    /**
+     * 采样前的准备条件
+     */
     public void onCallPreared() {
         if (jfOnPreparedListener != null) {
             jfOnPreparedListener.onPrepared();
         }
     }
 
+    /**
+     * 获取到文件的总时长和当前进度
+     *
+     * @param type      0子线程  1 主线程
+     * @param time_base 文件的总时长
+     * @param clock     当前进度
+     */
+    public void getAudioTime(int type, long time_base, double clock) {
+        Log.e("android", "time_base:" + time_base);
+        Log.e("android", "clock:" + clock);
+    }
+
     public void start() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                n_start();
+                if (flags == 1) {
+                    n_start();
+                } else if (flags == 2) {
+                    pcmStream();
+                }
+
             }
         }).start();
     }
@@ -58,4 +85,15 @@ public class JfPlayer {
 
     private native void n_start();
 
+    public native void n_stop();
+
+    public native void n_pause();
+
+    public native void n_resume();
+
+    public native void pcmLocal();
+
+    public native void pcmStream();
+
+    public native void seek(int current);
 }

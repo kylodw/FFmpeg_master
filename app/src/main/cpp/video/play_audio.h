@@ -6,6 +6,7 @@
 #define FFMPEG_MASTER_PLAY_AUDIO_H
 
 #include "play_queue.h"
+#include "play_call_java.h"
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
@@ -27,21 +28,24 @@ public:
     AVPacket *packet = NULL;
     AVFrame *frame = NULL;
     int ret = -1;
-
+    AVRational time_base;
+    int64_t total_duration;
     uint8_t *buffer = NULL;
     int data_size;//buffer size
-
+    double audio_clock;
 
     SLObjectItf engineObject;
     SLEngineItf engineEngine;
 
     SLObjectItf outputMixObject;
     SLEnvironmentalReverbItf outputMixEnvReb;
-    SLObjectItf  pcmPlay;
-     SLPlayItf pcmPlayerPlay;
-    SLAndroidSimpleBufferQueueItf  pcmBufferQueue;
+    SLObjectItf pcmPlay;
+    SLPlayItf pcmPlayerPlay;
+    SLAndroidSimpleBufferQueueItf pcmBufferQueue;
+
+    play_call_java  *callJava;
 public:
-    play_audio(play_status *ps);
+    play_audio(play_status *ps,play_call_java  *callJava);
 
     ~play_audio();
 
@@ -50,6 +54,21 @@ public:
     int resample_audio();
 
     void init_open_sles();
+
+    void stop_play();
+
+    void pause_play();
+
+    void resume_play();
+
+    void pcm_local_play();
+
+    void pcm_stream_play();
+
+    void release_play();
+
+
+
 };
 
 

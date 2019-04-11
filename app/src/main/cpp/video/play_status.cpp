@@ -6,5 +6,6 @@
 
 play_status::play_status() {
     exit = false;
+    seeking = false;
 
 }

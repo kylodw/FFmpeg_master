@@ -65,4 +65,18 @@ time_base 时间单位
   
 ### 常用命令
 播放 双通道 32K 的 PCM 音频数据
+
 ffplay -f s16le -ar 32000 -ac 2 test.pcm
+
+
+### NDK排查错误
+
+    > 保存logcat文件，分析日志
+    > ndk-stack工具   这个可以定位出内存地址
+    > adb logcat | ndk-stack -sym J:/mars-jee/dn_ffmpeg_player/obj/local/armeabi/
+    > addr2line   定位错误行  0x580001d就是错误地址
+    > arm-linux-androideabi-addr2line -e J:/mars-jee/dn_ffmpeg_player/obj/local/armeabi/libmyffmpeg.so 0x580001d
+    
+    
+    > 编译链  H:\androidsdk\ndk-bundle\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin
+    > native-lib so文件生成的位置  ：  F:\market_developer\Aop_master2\Ffmpeg_master\app\build\intermediates\cmake\debug\obj\armeabi-v7a

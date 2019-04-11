@@ -39,6 +39,21 @@ JNIEXPORT void init_input_from_context(Player *player, const char *input_p_s) {
         //如果需要字幕 也需要一个AVStream流
         if (format_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             player->video_stream_index = i;
+            LOGE("display %d:%d:%d:%d", format_context->streams[i]->avg_frame_rate.den,
+                 format_context->streams[i]->avg_frame_rate.num,
+                 format_context->streams[i]->display_aspect_ratio.den,
+                         format_context->streams[i]->display_aspect_ratio.num);
+            AVRational avRational;
+            av_reduce(&avRational.num, &avRational.den,
+                      format_context->streams[i]->codec->width *
+                      (int64_t) format_context->streams[i]->avg_frame_rate.num,
+                      format_context->streams[i]->codec->height *
+                      (int64_t) format_context->streams[i]->avg_frame_rate.den,
+                      1920 * 1080);
+//            LOGE("display_aspect_ratio： %d:%d:%d:%d", avRational.den, avRational.num,
+//                 format_context->streams[i]->sample_aspect_ratio.num,
+//                 format_context->streams[i]->sample_aspect_ratio.den);
+
         } else if (format_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
             player->audio_stream_index = i;
         } else {
@@ -132,6 +147,14 @@ void decode_video(Player *player, AVPacket *avPacket) {
         ANativeWindow_setBuffersGeometry(player->nativeWindow, codecContext->width,
                                          codecContext->height, WINDOW_FORMAT_RGBA_8888);
         LOGE("视频的宽和高22：%d %d", codecContext->width, codecContext->height);
+//        AVRational avRational;
+//        av_reduce(&avRational.num, &avRational.den,
+//                  codecContext->width *
+//                (int64_t) formatContext->streams[player->video_stream_index]->sample_aspect_ratio.num,
+//                  codecContext->height *
+//                (int64_t) formatContext->streams[player->video_stream_index]->sample_aspect_ratio.den,
+//                1920 * 1080);
+
         ANativeWindow_lock(player->nativeWindow, &outBuffer, NULL);
         //fix buffer  要转换成RGBA_8888  YUV
         //设置yuv缓冲区属性宽高等等，像素格式

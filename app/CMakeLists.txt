@@ -39,6 +39,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/video/play_audio.cpp
         src/main/cpp/video/play_queue.cpp
         src/main/cpp/video/play_status.cpp
+        src/main/cpp/video/play_video.cpp
         )
 #add_library(
 #        k_play
@@ -211,7 +212,7 @@ find_library(
 target_link_libraries( # Specifies the target library.
         #连接额外的ffmpeg
 
-        native-lib  avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv x264 faac rtmp
+        native-lib avcodec avdevice avfilter avformat avutil postproc wresample wscale yuv x264 faac rtmp
         # Links the target library to the log library
         # included in the NDK.
         -landroid # Add this.

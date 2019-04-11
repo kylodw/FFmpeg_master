@@ -54,3 +54,19 @@ int play_queue::putAvPacket(AVPacket *packet) {
     pthread_mutex_unlock(&mutex_p);
     return 0;
 }
+
+void play_queue::clearAvPacket() {
+    //有可能释放资源时线程还在加锁
+    pthread_cond_signal(&cond_p);
+
+    pthread_mutex_lock(&mutex_p);
+    while (!queue_packet.empty()) {
+        AVPacket *packet = queue_packet.front();
+        queue_packet.pop();
+        av_packet_free(&packet);
+        av_free(packet);
+        packet = NULL;
+    }
+    pthread_mutex_unlock(&mutex_p);
+
+}

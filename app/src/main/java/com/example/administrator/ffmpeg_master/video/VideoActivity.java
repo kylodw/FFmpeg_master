@@ -3,6 +3,7 @@ package com.example.administrator.ffmpeg_master.video;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 
 import com.example.administrator.ffmpeg_master.R;
@@ -24,7 +25,35 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     public void beginAudio(View view) {
-        jfPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+        jfPlayer.setFlags(1);
+        jfPlayer.setSource(Environment.getExternalStorageDirectory() + "/huge.mp4");
         jfPlayer.prepared();
+    }
+
+    public void stopAudio(View view) {
+        jfPlayer.n_stop();
+    }
+
+    public void pauseAudio(View view) {
+        jfPlayer.n_pause();
+    }
+
+    public void resumeAudio(View view) {
+        jfPlayer.n_resume();
+    }
+
+    public void pcmPlayLocal(View view) {
+        jfPlayer.pcmLocal();
+    }
+
+    public void pcmPlayStream(View view) {
+        jfPlayer.setFlags(2);
+        jfPlayer.setSource(Environment.getExternalStorageDirectory() + "/huge.mp4");
+        jfPlayer.prepared();
+    }
+
+    public void seekAudio(View view) {
+
+//        jfPlayer.seek(200);
     }
 }

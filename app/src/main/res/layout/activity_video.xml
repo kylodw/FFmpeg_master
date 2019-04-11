@@ -1,14 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".video.VideoActivity">
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="开始播放声音"
         android:onClick="beginAudio"
+        android:text="将url地址的mp3等等存为pcm文件" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="pcmPlayLocal"
+        android:text="利用OpenSLES播放本地PCM文件" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="stopAudio"
+        android:text="停止播放声音" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="pauseAudio"
+        android:text="暂停播放声音" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="resumeAudio"
+        android:text="继续播放声音" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SEEKING   10"
+        android:onClick="seekAudio"
         />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="pcmPlayStream"
+        android:text="利用OpenSLES播放流文件" />
+</LinearLayout>
